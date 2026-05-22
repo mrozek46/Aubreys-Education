@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Write My Name ✏️</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .instruction {
+            text-align: center;
+            color: white;
+            font-size: clamp(1rem, 3.5vw, 1.35rem);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+            margin: 0 0 12px;
+        }
+        .current-letter-label {
+            text-align: center;
+            font-size: clamp(1.3rem, 5vw, 2rem);
+            color: white;
+            text-shadow: 2px 2px 0 #9B59B6;
+            margin: 8px 0 4px;
+        }
+    </style>
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Home</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">✏️ Write My Name!</h1>
+
+    <p class="instruction">Trace each letter with your finger! 👆</p>
+
+    <!-- AUBREY letter indicators -->
+    <div class="aubrey-letters-row" id="letters-row">
+        <!-- built by JS -->
+    </div>
+
+    <p class="current-letter-label" id="current-label">Let's start with <strong>A</strong>!</p>
+
+    <div class="tracing-wrap">
+        <div class="ghost-letter" id="ghost-letter">A</div>
+        <canvas id="trace-canvas"></canvas>
+        <p class="trace-hint">Draw over the letter with your finger ✨</p>
+    </div>
+
+    <div class="trace-controls">
+        <button class="btn-clear" onclick="clearCanvas()">🗑️ Clear</button>
+        <button class="btn" id="next-btn" onclick="nextLetter()">Next Letter →</button>
+    </div>
+
+    <div class="progress-bar" style="margin-top:18px">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+</div>
+
+<!-- Celebration -->
+<div class="celebration-overlay" id="celebration-overlay">
+    <div class="celebrate-text" id="celebrate-text"></div>
+    <div class="celebrate-sub"  id="celebrate-sub"></div>
+    <button class="btn" id="cel-btn">🌟 Keep going!</button>
+</div>
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+const NAME = ['A','U','B','R','E','Y'];
+let currentIdx = 0;
+let isDrawing  = false;
+let hue        = 0;
+let hasDrawn   = false;
+
+initSparkles();
+initStarBar();
+
+// Build letter indicators
+const row = document.getElementById('letters-row');
+NAME.forEach((letter, i) => {
+    const div = document.createElement('div');
+    div.className = 'al' + (i === 0 ? ' active' : '');
+    div.textContent = letter;
+    div.id = 'al-' + i;
+    row.appendChild(div);
+});
+
+// Canvas setup
+const canvas = document.getElementById('trace-canvas');
+const ctx    = canvas.getContext('2d');
+
+function setupCanvas() {
+    const dpr  = window.devicePixelRatio || 1;
+    const rect  = canvas.getBoundingClientRect();
+    canvas.width  = rect.width  * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+}
+
+window.addEventListener('resize', () => { setupCanvas(); clearCanvas(); });
+// Defer setup so CSS has laid out the element
+requestAnimationFrame(() => { requestAnimationFrame(setupCanvas); });
+
+function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const src  = e.touches ? e.touches[0] : e;
+    return {
+        x: src.clientX - rect.left,
+        y: src.clientY - rect.top
+    };
+}
+
+function drawSparkle(x, y) {
+    hue = (hue + 3) % 360;
+    const r = 18;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, `hsla(${hue}, 100%, 68%, 0.9)`);
+    g.addColorStop(1, `hsla(${hue + 40}, 100%, 68%, 0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Occasional tiny star dot
+    if (Math.random() > 0.65) {
+        ctx.fillStyle = `hsla(${hue + 80}, 100%, 80%, 0.75)`;
+        ctx.font = `${10 + Math.random() * 8}px serif`;
+        ctx.fillText('✦', x + (Math.random() - 0.5) * 36, y + (Math.random() - 0.5) * 36);
+    }
+}
+
+// Pointer events (works on both touch and mouse)
+canvas.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    isDrawing = true;
+    hasDrawn  = true;
+    canvas.setPointerCapture(e.pointerId);
+    const p = getPos(e);
+    drawSparkle(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener('pointermove', e => {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const p = getPos(e);
+    drawSparkle(p.x, p.y);
+}, { passive: false });
+
+canvas.addEventListener('pointerup',     () => { isDrawing = false; });
+canvas.addEventListener('pointercancel', () => { isDrawing = false; });
+
+function clearCanvas() {
+    const dpr   = window.devicePixelRatio || 1;
+    const rect  = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    hasDrawn = false;
+}
+
+function updateUI() {
+    const letter = NAME[currentIdx];
+    document.getElementById('ghost-letter').textContent = letter;
+    document.getElementById('current-label').innerHTML =
+        currentIdx < NAME.length
+            ? `Now trace the letter <strong style="color:#FFD700">${letter}</strong>!`
+            : '';
+
+    NAME.forEach((_, i) => {
+        const el = document.getElementById('al-' + i);
+        el.className = 'al' +
+            (i < currentIdx  ? ' done'   : '') +
+            (i === currentIdx ? ' active' : '');
+    });
+
+    const pct = (currentIdx / NAME.length) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('next-btn').textContent =
+        currentIdx < NAME.length - 1 ? 'Next Letter →' : '🎉 I did it!';
+}
+
+function nextLetter() {
+    if (!hasDrawn) {
+        speak('Try tracing the letter first!');
+        return;
+    }
+    addStars(1);
+    clearCanvas();
+
+    if (currentIdx < NAME.length - 1) {
+        currentIdx++;
+        updateUI();
+        speak(`Great job! Now trace the letter ${NAME[currentIdx]}!`);
+    } else {
+        // All done!
+        currentIdx = NAME.length;
+        NAME.forEach((_, i) => { document.getElementById('al-' + i).className = 'al done'; });
+        document.getElementById('progress-fill').style.width = '100%';
+        document.getElementById('ghost-letter').textContent = '🌟';
+        document.getElementById('current-label').textContent = '';
+
+        showCelebration(
+            '🎉 AUBREY! 🎉',
+            'You wrote your whole name! You are AMAZING! 🦄✨'
+        );
+        speak('Aubrey! You did it! You wrote your whole name! You are so amazing!');
+
+        const celBtn = document.getElementById('cel-btn');
+        celBtn.textContent = '🏠 Back to Home';
+        celBtn.onclick = () => window.location.href = 'index.html';
+    }
+}
+
+// Init
+updateUI();
+speak(`Let's write your name! Trace the letter ${NAME[0]} with your finger!`, 0.88, 1.2);
+</script>
+</body>
+</html>

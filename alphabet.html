@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Learn ABCs 🔤</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .progress-text {
+            text-align: center;
+            color: white;
+            font-size: 1.05rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+            margin-bottom: 6px;
+        }
+        .letter-btn .sub { font-size: 0.45em; display: block; margin-top: 3px; }
+
+        /* replay button inside popup */
+        .popup-replay {
+            background: transparent;
+            border: 2px solid #D7A8F0;
+            color: #9B59B6;
+            border-radius: 50px;
+            padding: 10px 22px;
+            font-family: inherit;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: transform 0.12s;
+        }
+        .popup-replay:active { transform: scale(0.92); }
+
+        .all-done-banner {
+            display: none;
+            text-align: center;
+            background: linear-gradient(135deg,#FFD700,#FFA500);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 18px;
+            font-size: 1.4rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 20px rgba(255,165,0,0.4);
+        }
+    </style>
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Home</a>
+
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">🔤 Learn ABCs!</h1>
+
+    <div class="all-done-banner" id="all-done">
+        🎉 Amazing! You know ALL 26 letters! You're a superstar! ⭐🦄
+    </div>
+
+    <p class="progress-text">Tap each letter to learn it!
+        <span id="learned-count">0</span>/26 letters ⭐</p>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+
+    <div class="letter-grid" id="letter-grid"></div>
+</div>
+
+<!-- Popup -->
+<div class="popup-overlay" id="overlay" onclick="closePopup()"></div>
+<div class="letter-popup" id="popup">
+    <div class="popup-big-letter" id="popup-letter">A</div>
+    <div class="popup-emoji"      id="popup-emoji">🍎</div>
+    <div class="popup-word"       id="popup-word">Apple</div>
+    <div class="popup-phrase"     id="popup-phrase">A says "Ah!"</div>
+    <button class="popup-replay"  id="popup-replay" onclick="replaySound()">🔊 Hear it again!</button>
+    <button class="popup-close"   onclick="closePopup()">All done! ✨</button>
+</div>
+
+<!-- Celebration -->
+<div class="celebration-overlay" id="celebration-overlay">
+    <div class="celebrate-text" id="celebrate-text"></div>
+    <div class="celebrate-sub"  id="celebrate-sub"></div>
+    <button class="btn" onclick="document.getElementById('celebration-overlay').classList.remove('show')">
+        Yay! Keep going! 🌟
+    </button>
+</div>
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+const LETTERS = [
+    { l:'A', w:'Apple',     e:'🍎',  p:'A says "Ah"!' },
+    { l:'B', w:'Butterfly', e:'🦋',  p:'B says "Buh"!' },
+    { l:'C', w:'Crown',     e:'👑',  p:'C says "Kuh"!' },
+    { l:'D', w:'Diamond',   e:'💎',  p:'D says "Duh"!' },
+    { l:'E', w:'Elephant',  e:'🐘',  p:'E says "Eh"!' },
+    { l:'F', w:'Flower',    e:'🌸',  p:'F says "Fuh"!' },
+    { l:'G', w:'Glitter',   e:'✨',  p:'G says "Guh"!' },
+    { l:'H', w:'Heart',     e:'❤️',  p:'H says "Huh"!' },
+    { l:'I', w:'Ice Cream', e:'🍦',  p:'I says "Ih"!' },
+    { l:'J', w:'Jellyfish', e:'🪼',  p:'J says "Juh"!' },
+    { l:'K', w:'Kitten',    e:'🐱',  p:'K says "Kuh"!' },
+    { l:'L', w:'Lollipop',  e:'🍭',  p:'L says "Luh"!' },
+    { l:'M', w:'Mermaid',   e:'🧜‍♀️', p:'M says "Muh"!' },
+    { l:'N', w:'Night Sky', e:'🌙',  p:'N says "Nuh"!' },
+    { l:'O', w:'Ocean',     e:'🌊',  p:'O says "Awe"!' },
+    { l:'P', w:'Princess',  e:'👸',  p:'P says "Puh"!' },
+    { l:'Q', w:'Queen',     e:'👑',  p:'Q says "Kwuh"!' },
+    { l:'R', w:'Rainbow',   e:'🌈',  p:'R says "Ruh"!' },
+    { l:'S', w:'Star',      e:'⭐',  p:'S says "Sss"!' },
+    { l:'T', w:'Tiara',     e:'🪄',  p:'T says "Tuh"!' },
+    { l:'U', w:'Unicorn',   e:'🦄',  p:'U says "Uh"!' },
+    { l:'V', w:'Violet',    e:'💜',  p:'V says "Vuh"!' },
+    { l:'W', w:'Wand',      e:'✨',  p:'W says "Wuh"!' },
+    { l:'X', w:'Xylophone', e:'🎵',  p:'X says "Ks"!' },
+    { l:'Y', w:'Yarn',      e:'🧶',  p:'Y says "Yuh"!' },
+    { l:'Z', w:'Zebra',     e:'🦓',  p:'Z says "Zuh"!' },
+];
+
+let learned = JSON.parse(localStorage.getItem('learnedLetters') || '[]');
+let currentEntry = null;
+
+initSparkles();
+initStarBar();
+
+function updateProgress() {
+    const n = learned.length;
+    document.getElementById('learned-count').textContent = n;
+    document.getElementById('progress-fill').style.width = (n / 26 * 100) + '%';
+    if (n === 26) document.getElementById('all-done').style.display = 'block';
+}
+
+// Build grid
+const grid = document.getElementById('letter-grid');
+LETTERS.forEach(entry => {
+    const btn = document.createElement('button');
+    btn.className = 'letter-btn' + (learned.includes(entry.l) ? ' learned' : '');
+    btn.innerHTML = `${entry.l}<span class="sub">${entry.e}</span>`;
+    btn.dataset.letter = entry.l;
+    btn.addEventListener('pointerdown', () => openPopup(entry, btn));
+    grid.appendChild(btn);
+});
+
+updateProgress();
+
+function replaySound() {
+    if (!currentEntry) return;
+    speak(`${currentEntry.p} ${currentEntry.l} is for ${currentEntry.w}!`);
+}
+
+function openPopup(entry, btn) {
+    currentEntry = entry;
+    document.getElementById('popup-letter').textContent = entry.l;
+    document.getElementById('popup-emoji').textContent  = entry.e;
+    document.getElementById('popup-word').textContent   = entry.w;
+    document.getElementById('popup-phrase').textContent = entry.p;
+
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById('popup').classList.add('show');
+
+    speak(`${entry.p} ${entry.l} is for ${entry.w}!`);
+
+    if (!learned.includes(entry.l)) {
+        learned.push(entry.l);
+        localStorage.setItem('learnedLetters', JSON.stringify(learned));
+        btn.classList.add('learned');
+        addStars(1);
+        updateProgress();
+
+        if (learned.length === 26) {
+            setTimeout(() => {
+                closePopup();
+                showCelebration('🌈 You know ALL the letters! 🌈', 'You are SO smart, Aubrey! ⭐');
+                speak('Amazing! You know all 26 letters! You are so smart!');
+            }, 1800);
+        }
+    }
+}
+
+function closePopup() {
+    document.getElementById('overlay').classList.remove('show');
+    document.getElementById('popup').classList.remove('show');
+    window.speechSynthesis?.cancel();
+    currentEntry = null;
+}
+</script>
+</body>
+</html>

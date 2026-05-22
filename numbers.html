@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Count with Me 🔢</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .number-display {
+            text-align: center;
+            margin: 4px 0 10px;
+        }
+        .count-status {
+            text-align: center;
+            font-size: 1.15rem;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            min-height: 1.6em;
+            margin: 4px 0;
+        }
+        .tap-hint {
+            text-align: center;
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.85);
+            font-family: 'Nunito', sans-serif;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Home</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">🔢 Count with Me!</h1>
+
+    <div class="number-display">
+        <div class="big-number" id="big-number">1</div>
+        <div class="number-word" id="number-word">One</div>
+    </div>
+
+    <p class="tap-hint">Tap each one to count! 👆</p>
+    <p class="count-status" id="count-status"></p>
+
+    <div class="items-display" id="items-display"></div>
+
+    <div class="nav-row">
+        <button class="btn" id="prev-btn" onclick="changeNumber(-1)">← Back</button>
+        <button class="btn" id="count-btn" onclick="autoCount()">🔊 Count!</button>
+        <button class="btn" id="next-btn" onclick="changeNumber(1)">Next →</button>
+    </div>
+</div>
+
+<!-- Celebration -->
+<div class="celebration-overlay" id="celebration-overlay">
+    <div class="celebrate-text" id="celebrate-text"></div>
+    <div class="celebrate-sub"  id="celebrate-sub"></div>
+    <button class="btn" onclick="document.getElementById('celebration-overlay').classList.remove('show')">
+        Yay! 🌟
+    </button>
+</div>
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+const NUMBERS = [
+    { n:1,  word:'One',   items:['🦄'],                                                              color:'#FF6EB4' },
+    { n:2,  word:'Two',   items:['🌟','🌟'],                                                          color:'#FF9500' },
+    { n:3,  word:'Three', items:['🌸','🌸','🌸'],                                                      color:'#FFD700' },
+    { n:4,  word:'Four',  items:['💎','💎','💎','💎'],                                                  color:'#4CD964' },
+    { n:5,  word:'Five',  items:['🐚','🐚','🐚','🐚','🐚'],                                              color:'#5AC8FA' },
+    { n:6,  word:'Six',   items:['🌈','🌈','🌈','🌈','🌈','🌈'],                                          color:'#9B59B6' },
+    { n:7,  word:'Seven', items:['⭐','⭐','⭐','⭐','⭐','⭐','⭐'],                                        color:'#FF2D55' },
+    { n:8,  word:'Eight', items:['🦋','🦋','🦋','🦋','🦋','🦋','🦋','🦋'],                                  color:'#FF6EB4' },
+    { n:9,  word:'Nine',  items:['💜','💜','💜','💜','💜','💜','💜','💜','💜'],                              color:'#5856D6' },
+    { n:10, word:'Ten',   items:['🍭','🍭','🍭','🍭','🍭','🍭','🍭','🍭','🍭','🍭'],                          color:'#FF9500' },
+];
+
+const WORDS = ['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
+
+let currentIdx = 0;
+let countedSoFar = 0;
+let isAutocounting = false;
+let earnedNumbers = JSON.parse(localStorage.getItem('earnedNumbers') || '[]');
+
+initSparkles();
+initStarBar();
+
+function renderNumber() {
+    const entry = NUMBERS[currentIdx];
+    document.getElementById('big-number').textContent   = entry.n;
+    document.getElementById('number-word').textContent  = entry.word;
+    document.getElementById('count-status').textContent = '';
+    countedSoFar = 0;
+
+    document.getElementById('prev-btn').disabled = currentIdx === 0;
+    document.getElementById('next-btn').disabled = currentIdx === NUMBERS.length - 1;
+
+    const display = document.getElementById('items-display');
+    display.innerHTML = '';
+    entry.items.forEach((emoji, i) => {
+        const span = document.createElement('span');
+        span.className = 'count-item';
+        span.textContent = emoji;
+        span.dataset.index = i;
+        span.addEventListener('pointerdown', () => tapItem(i, span));
+        display.appendChild(span);
+    });
+}
+
+function tapItem(idx, span) {
+    if (span.classList.contains('counted')) return;
+    countedSoFar++;
+    span.classList.add('counted');
+    speak(WORDS[countedSoFar - 1], 0.88, 1.3);
+    document.getElementById('count-status').textContent =
+        `${countedSoFar} out of ${NUMBERS[currentIdx].n}`;
+
+    if (countedSoFar === NUMBERS[currentIdx].n) {
+        const n = NUMBERS[currentIdx].n;
+        setTimeout(() => {
+            document.getElementById('count-status').textContent =
+                `You counted to ${n}! Amazing! 🌟`;
+            speak(`Amazing! You counted all the way to ${n}!`);
+
+            if (!earnedNumbers.includes(n)) {
+                earnedNumbers.push(n);
+                localStorage.setItem('earnedNumbers', JSON.stringify(earnedNumbers));
+                addStars(1);
+                if (earnedNumbers.length === 10) {
+                    setTimeout(() => showCelebration(
+                        '🏆 You counted to 10! 🏆',
+                        'You counted ALL the numbers! Super star! ⭐'
+                    ), 1000);
+                }
+            }
+        }, 400);
+    }
+}
+
+function autoCount() {
+    if (isAutocounting) return;
+    isAutoounting = true;
+    const entry = NUMBERS[currentIdx];
+    const items = document.querySelectorAll('.count-item');
+    // Reset
+    items.forEach(el => el.classList.remove('counted'));
+    countedSoFar = 0;
+    document.getElementById('count-status').textContent = '';
+
+    let i = 0;
+    function countNext() {
+        if (i >= entry.n) { isAutoounting = false; return; }
+        items[i].classList.add('counted');
+        countedSoFar++;
+        speak(WORDS[i], 0.88, 1.3);
+        document.getElementById('count-status').textContent =
+            `${countedSoFar} out of ${entry.n}`;
+        i++;
+        if (i < entry.n) setTimeout(countNext, 900);
+        else {
+            isAutoounting = false;
+            setTimeout(() => {
+                document.getElementById('count-status').textContent =
+                    `You counted to ${entry.n}! Amazing! 🌟`;
+            }, 900);
+        }
+    }
+    speak(WORDS[0], 0.88, 1.3);
+    items[0].classList.add('counted');
+    countedSoFar = 1;
+    document.getElementById('count-status').textContent = `1 out of ${entry.n}`;
+    i = 1;
+    if (entry.n > 1) setTimeout(countNext, 900);
+    else {
+        isAutoounting = false;
+        setTimeout(() => {
+            document.getElementById('count-status').textContent = `You counted to 1!`;
+        }, 900);
+    }
+}
+
+function changeNumber(dir) {
+    const next = currentIdx + dir;
+    if (next < 0 || next >= NUMBERS.length) return;
+    currentIdx = next;
+    renderNumber();
+    const entry = NUMBERS[currentIdx];
+    speak(`The number ${entry.n}. ${entry.word}!`);
+}
+
+// Init
+renderNumber();
+speak('Let\'s count together! Tap each one to count!');
+</script>
+</body>
+</html>

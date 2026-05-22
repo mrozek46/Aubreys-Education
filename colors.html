@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Colors! 🌈</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .feedback-text {
+            text-align: center;
+            font-size: clamp(1.3rem, 5vw, 2rem);
+            color: white;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            min-height: 2em;
+            margin: 8px 0;
+            transition: opacity 0.3s;
+        }
+        .rounds-text {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+        .color-hint { font-size: clamp(2.5rem, 9vw, 4rem); display: block; margin: 6px 0; }
+    </style>
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Home</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">🌈 Colors!</h1>
+
+    <div class="score-display">Score: <span id="score">0</span> ⭐</div>
+    <p class="rounds-text">Round <span id="round-num">1</span> of 10</p>
+
+    <div class="color-prompt">
+        <div class="color-name" id="color-name">Red</div>
+        <span class="color-hint" id="color-hint">❤️</span>
+    </div>
+
+    <p class="feedback-text" id="feedback-text"></p>
+
+    <div class="color-choices" id="color-choices">
+        <!-- built by JS -->
+    </div>
+
+    <div class="progress-bar" style="margin-top:22px">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+</div>
+
+<!-- Celebration -->
+<div class="celebration-overlay" id="celebration-overlay">
+    <div class="celebrate-text" id="celebrate-text"></div>
+    <div class="celebrate-sub"  id="celebrate-sub"></div>
+    <button class="btn" id="cel-btn" onclick="startGame()">Play Again! 🌈</button>
+</div>
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+const COLORS = [
+    { name:'Red',    hex:'#FF3B30', hint:'❤️',  say:'Red, like a heart!' },
+    { name:'Orange', hex:'#FF9500', hint:'🍊',  say:'Orange, like an orange!' },
+    { name:'Yellow', hex:'#FFCC00', hint:'⭐',  say:'Yellow, like a star!' },
+    { name:'Green',  hex:'#34C759', hint:'🍀',  say:'Green, like a four-leaf clover!' },
+    { name:'Blue',   hex:'#007AFF', hint:'🌊',  say:'Blue, like the ocean!' },
+    { name:'Purple', hex:'#AF52DE', hint:'🦄',  say:'Purple, like a unicorn!' },
+    { name:'Pink',   hex:'#FF6EB4', hint:'🌸',  say:'Pink, like a flower!' },
+    { name:'White',  hex:'#F0F0F0', hint:'☁️',  say:'White, like a cloud!' },
+];
+
+let round       = 0;
+let score       = 0;
+let totalRounds = 10;
+let locked      = false;
+let usedColors  = [];
+
+initSparkles();
+initStarBar();
+
+function shuffle(arr) {
+    return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function pickQuestion() {
+    // Cycle through colors, looping if needed
+    if (usedColors.length >= COLORS.length) usedColors = [];
+    const remaining = COLORS.filter(c => !usedColors.includes(c.name));
+    const correct   = remaining[Math.floor(Math.random() * remaining.length)];
+    usedColors.push(correct.name);
+
+    // Pick 3 wrong answers (different from correct)
+    const wrong = shuffle(COLORS.filter(c => c.name !== correct.name)).slice(0, 3);
+    const choices = shuffle([correct, ...wrong]);
+    return { correct, choices };
+}
+
+let currentCorrect = null;
+
+function renderRound() {
+    locked = false;
+    const { correct, choices } = pickQuestion();
+    currentCorrect = correct;
+
+    document.getElementById('color-name').textContent  = correct.name;
+    document.getElementById('color-hint').textContent  = correct.hint;
+    document.getElementById('feedback-text').textContent = '';
+    document.getElementById('round-num').textContent   = round + 1;
+    document.getElementById('progress-fill').style.width = (round / totalRounds * 100) + '%';
+
+    speak(`Find the color ${correct.name}! ${correct.say}`);
+
+    const grid = document.getElementById('color-choices');
+    grid.innerHTML = '';
+    choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className  = 'color-btn';
+        btn.style.background = c.hex;
+        // White needs a border so it's visible
+        if (c.name === 'White') btn.style.border = '3px solid #DDD';
+        btn.addEventListener('pointerdown', () => handleChoice(btn, c));
+        grid.appendChild(btn);
+    });
+}
+
+function handleChoice(btn, chosen) {
+    if (locked) return;
+    locked = true;
+
+    if (chosen.name === currentCorrect.name) {
+        btn.classList.add('correct');
+        score++;
+        document.getElementById('score').textContent = score;
+        document.getElementById('feedback-text').textContent = '✅ Yes! ' + currentCorrect.say;
+        speak(`Yes! That\'s ${currentCorrect.name}! Amazing!`);
+        addStars(1);
+        round++;
+        if (round < totalRounds) {
+            setTimeout(renderRound, 1600);
+        } else {
+            setTimeout(() => endGame(), 1600);
+        }
+    } else {
+        btn.classList.add('wrong');
+        document.getElementById('feedback-text').textContent = `❌ Try again! Find ${currentCorrect.name}!`;
+        speak(`Hmm, try again! Find the color ${currentCorrect.name}!`);
+        setTimeout(() => {
+            btn.classList.remove('wrong');
+            locked = false;
+        }, 1000);
+    }
+}
+
+function endGame() {
+    const pct = Math.round((score / totalRounds) * 100);
+    let headline = '🌈 Game Over! 🌈';
+    let sub      = `You got ${score} out of ${totalRounds} right! `;
+
+    if (pct === 100) { headline = '🏆 PERFECT! 🏆'; sub += 'You know ALL the colors! ⭐'; }
+    else if (pct >= 70) sub += 'Great job, superstar! ⭐';
+    else sub += 'Keep practicing, you\'re doing great! 💜';
+
+    showCelebration(headline, sub);
+    speak(`You got ${score} out of ${totalRounds} right! Great job!`);
+
+    const celBtn = document.getElementById('cel-btn');
+    celBtn.textContent = 'Play Again! 🌈';
+    celBtn.onclick = () => {
+        document.getElementById('celebration-overlay').classList.remove('show');
+        startGame();
+    };
+}
+
+function startGame() {
+    round = 0;
+    score = 0;
+    usedColors = [];
+    document.getElementById('score').textContent = '0';
+    renderRound();
+}
+
+startGame();
+</script>
+</body>
+</html>
