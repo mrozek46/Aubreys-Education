@@ -108,20 +108,20 @@ function handlePick(letter, btn) {
         streak++;
         localStorage.setItem('alphabetFindStreak', streak);
         document.getElementById('streak').textContent = streak;
-        speak(`Yes! ${letter}!`, 0.7, 1.25);
-
-        if (streak > 0 && streak % 5 === 0) {
-            setTimeout(() => {
-                showCelebration(`🔥 ${streak} in a row! 🔥`, 'You are on fire! Keep going!');
-                const cel = document.getElementById('cel-btn');
-                cel.onclick = () => {
-                    document.getElementById('celebration-overlay').classList.remove('show');
-                    render();
-                };
-            }, 1400);
-        } else {
-            setTimeout(render, 1800);
-        }
+        speak(`Yes! ${letter}!`, 0.7, 1.25, () => {
+            if (streak > 0 && streak % 5 === 0) {
+                setTimeout(() => {
+                    showCelebration(`🔥 ${streak} in a row! 🔥`, 'You are on fire! Keep going!');
+                    const cel = document.getElementById('cel-btn');
+                    cel.onclick = () => {
+                        document.getElementById('celebration-overlay').classList.remove('show');
+                        render();
+                    };
+                }, 300);
+            } else {
+                setTimeout(render, 500);
+            }
+        });
     } else {
         btn.classList.add('wrong');
         speak(`That's ${letter}. Find the ${target}!`, 0.7);

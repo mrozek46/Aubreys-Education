@@ -37,8 +37,11 @@ if ('speechSynthesis' in window) {
     window.speechSynthesis.onvoiceschanged = _loadVoices;
 }
 
-function speak(text, rate = 0.92, pitch = 1.15) {
-    if (!('speechSynthesis' in window)) return;
+function speak(text, rate = 0.92, pitch = 1.15, onEnd) {
+    if (!('speechSynthesis' in window)) {
+        if (onEnd) setTimeout(onEnd, 0);
+        return;
+    }
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     if (!_preferredVoice) _loadVoices();
@@ -50,6 +53,7 @@ function speak(text, rate = 0.92, pitch = 1.15) {
     }
     u.rate  = rate;
     u.pitch = pitch;
+    if (onEnd) u.onend = onEnd;
     window.speechSynthesis.speak(u);
 }
 
