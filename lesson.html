@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Today's Magic Lesson ✨</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Home</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">✨ Today's Lesson ✨</h1>
+
+    <div class="lesson-page" id="lesson-page">
+        <p class="lesson-page-eyebrow" id="eyebrow">Today is...</p>
+        <span class="lesson-page-emoji"  id="emoji">🔤</span>
+        <h2 class="lesson-page-title"     id="title">Let's learn!</h2>
+        <p class="lesson-page-encouragement" id="encouragement">
+            You are so smart, Aubrey! Let's have fun learning today. 💖
+        </p>
+        <a href="#" class="lesson-go-btn" id="go-btn">Let's Go! 🚀</a>
+        <a href="index.html" class="lesson-alt-link">Or pick something else →</a>
+    </div>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+initSparkles();
+initStarBar();
+
+const lesson = getTodaysLesson();
+const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const today  = days[new Date().getDay()];
+
+document.getElementById('eyebrow').textContent = `${today}'s Magic Lesson`;
+document.getElementById('emoji').textContent   = lesson.emoji;
+document.getElementById('title').textContent   = lesson.title;
+
+const goBtn = document.getElementById('go-btn');
+goBtn.href  = lesson.href;
+goBtn.textContent = lesson.cta + ' 🚀';
+
+if (isLessonCompletedToday()) {
+    document.getElementById('lesson-page').classList.add('done');
+    document.getElementById('encouragement').innerHTML =
+        '🌟 You already did today\'s lesson! 🌟<br>Want to play it again?';
+}
+
+// Mark complete when she taps the button
+goBtn.addEventListener('click', () => {
+    markLessonComplete();
+});
+
+// Friendly intro voice
+setTimeout(() => {
+    speak(`Today's lesson is: ${lesson.title}`);
+}, 350);
+</script>
+</body>
+</html>

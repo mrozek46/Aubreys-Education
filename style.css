@@ -483,3 +483,312 @@ body {
     .card { padding: 20px 10px; }
     .letter-grid { gap: 7px; }
 }
+
+/* ============================================================
+   Phase 1: Guided learning path
+   ============================================================ */
+
+/* Today's Magic Lesson banner */
+.lesson-banner {
+    display: block;
+    background: linear-gradient(135deg, #FFD700 0%, #FF8E53 55%, #FF6EB4 100%);
+    border-radius: 28px;
+    padding: 22px 22px 24px;
+    margin: 0 4px 22px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 10px 32px rgba(255,140,80,0.45);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+.lesson-banner:active { transform: scale(0.97); }
+.lesson-banner::before {
+    content: '✨';
+    position: absolute;
+    top: 8px; left: 12px;
+    font-size: 1.4rem;
+    opacity: 0.85;
+    animation: ghost-pulse 2.4s ease-in-out infinite;
+}
+.lesson-banner::after {
+    content: '✨';
+    position: absolute;
+    bottom: 8px; right: 14px;
+    font-size: 1.4rem;
+    opacity: 0.85;
+    animation: ghost-pulse 2.4s ease-in-out infinite 0.6s;
+}
+.lesson-eyebrow {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.95;
+    margin: 0 0 4px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.18);
+}
+.lesson-title {
+    font-size: clamp(1.4rem, 5.5vw, 2rem);
+    margin: 4px 0 12px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.18);
+    line-height: 1.15;
+}
+.lesson-emoji { font-size: 2.4rem; display: block; margin-bottom: 4px; }
+.lesson-cta {
+    display: inline-block;
+    background: white;
+    color: #9B59B6;
+    border-radius: 50px;
+    padding: 12px 26px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+.lesson-banner.complete {
+    background: linear-gradient(135deg, #A29BFE 0%, #6C5CE7 100%);
+    box-shadow: 0 8px 24px rgba(108,92,231,0.4);
+}
+.lesson-banner.complete .lesson-eyebrow::after { content: ' — done!'; }
+
+/* 6-card activity path */
+.path-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 0 4px;
+}
+@media (min-width: 720px) {
+    .path-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.path-card {
+    position: relative;
+    background: white;
+    border-radius: 24px;
+    padding: 22px 14px 16px;
+    text-align: center;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.12);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 160px;
+}
+.path-card:active { transform: scale(0.95); }
+.path-card-emoji {
+    font-size: clamp(2.4rem, 9vw, 3.4rem);
+    margin-bottom: 6px;
+    line-height: 1;
+}
+.path-card-title {
+    font-size: clamp(1rem, 3.5vw, 1.25rem);
+    color: #9B59B6;
+    margin: 0 0 6px;
+    line-height: 1.15;
+}
+.path-progress {
+    margin-top: auto;
+    background: linear-gradient(135deg, #FFE5F1, #EAD5FF);
+    color: #7D3C98;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 5px 12px;
+    border-radius: 50px;
+    display: inline-block;
+    line-height: 1.2;
+}
+
+/* "Coming Soon" disabled card variant */
+.path-card.disabled {
+    background: rgba(255,255,255,0.55);
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.7;
+}
+.path-card.disabled .path-card-title { color: #B395C8; }
+.coming-soon-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #9B59B6;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.65rem;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 50px;
+    box-shadow: 0 2px 6px rgba(155,89,182,0.45);
+}
+
+/* ============================================================
+   Phase 1: Sticker board
+   ============================================================ */
+.sticker-summary {
+    background: rgba(255,255,255,0.85);
+    border-radius: 22px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    margin-bottom: 16px;
+}
+.sticker-summary .count {
+    font-size: clamp(2rem, 8vw, 3rem);
+    color: #9B59B6;
+    margin: 0;
+    line-height: 1;
+}
+.sticker-summary .label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    color: #7D3C98;
+    margin: 6px 0 0;
+}
+.sticker-next {
+    margin-top: 10px;
+    background: linear-gradient(135deg,#FFD700,#FF8E53);
+    color: white;
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    display: inline-block;
+    box-shadow: 0 3px 10px rgba(255,140,80,0.4);
+}
+
+.sticker-board {
+    background: white;
+    border-radius: 26px;
+    padding: 18px;
+    box-shadow: 0 8px 26px rgba(0,0,0,0.14);
+    background-image:
+        radial-gradient(rgba(155,89,182,0.06) 1.5px, transparent 1.5px),
+        radial-gradient(rgba(255,110,180,0.06) 1.5px, transparent 1.5px);
+    background-size: 18px 18px;
+    background-position: 0 0, 9px 9px;
+}
+.sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+@media (min-width: 560px) {
+    .sticker-grid { grid-template-columns: repeat(5, 1fr); }
+}
+@media (min-width: 760px) {
+    .sticker-grid { grid-template-columns: repeat(6, 1fr); }
+}
+.sticker-slot {
+    aspect-ratio: 1;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.8rem, 7vw, 2.6rem);
+    position: relative;
+    transition: transform 0.2s;
+}
+.sticker-slot.filled {
+    background: linear-gradient(135deg, #FFF6F9, #F4E8FF);
+    box-shadow: 0 4px 12px rgba(155,89,182,0.18);
+    animation: sticker-pop 0.5s ease;
+}
+.sticker-slot.empty {
+    background: rgba(155,89,182,0.06);
+    border: 2.5px dashed rgba(155,89,182,0.32);
+    color: rgba(155,89,182,0.35);
+}
+.sticker-slot.new::after {
+    content: 'NEW';
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    background: #FF3B30;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.55rem;
+    letter-spacing: 0.5px;
+    padding: 3px 7px;
+    border-radius: 50px;
+    box-shadow: 0 2px 6px rgba(255,59,48,0.4);
+    animation: bounce-in 0.5s ease;
+}
+@keyframes sticker-pop {
+    0%   { transform: scale(0) rotate(-20deg); }
+    60%  { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+.sticker-empty-msg {
+    text-align: center;
+    color: white;
+    font-size: 1.15rem;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+    margin: 16px 0 0;
+}
+
+/* ============================================================
+   Phase 1: Lesson page
+   ============================================================ */
+.lesson-page {
+    text-align: center;
+    padding: 40px 24px;
+    background: white;
+    border-radius: 32px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.14);
+    margin: 12px 4px;
+}
+.lesson-page-eyebrow {
+    font-family: 'Nunito', sans-serif;
+    color: #BB8FCE;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+.lesson-page-emoji  { font-size: clamp(4rem, 16vw, 6rem); line-height: 1; margin: 10px 0; }
+.lesson-page-title  {
+    font-size: clamp(1.8rem, 7vw, 2.6rem);
+    color: #9B59B6;
+    margin: 6px 0 22px;
+}
+.lesson-page-encouragement {
+    font-family: 'Nunito', sans-serif;
+    color: #7D3C98;
+    font-size: 1.05rem;
+    margin: 0 0 22px;
+    line-height: 1.5;
+}
+.lesson-go-btn {
+    background: linear-gradient(135deg, #FF6EB4, #9B59B6);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 18px 42px;
+    font-family: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(155,89,182,0.4);
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.15s;
+}
+.lesson-go-btn:active { transform: scale(0.95); }
+.lesson-page.done .lesson-page-title::after { content: ' ✓'; color: #4CD964; }
+.lesson-alt-link {
+    display: block;
+    margin-top: 18px;
+    color: #9B59B6;
+    text-decoration: underline;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+}

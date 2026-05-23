@@ -4,70 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Aubrey's Magic School ✨</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .hero {
             text-align: center;
-            padding: 30px 10px 10px;
+            padding: 26px 10px 18px;
         }
         .mascot {
-            font-size: clamp(3rem, 12vw, 5rem);
+            font-size: clamp(2.6rem, 11vw, 4.4rem);
             display: inline-block;
             animation: float 2.8s ease-in-out infinite;
             cursor: default;
         }
         @keyframes float {
-            0%, 100% { transform: translateY(0)   rotate(-4deg); }
-            50%       { transform: translateY(-18px) rotate(4deg);  }
+            0%, 100% { transform: translateY(0)    rotate(-4deg); }
+            50%       { transform: translateY(-16px) rotate(4deg);  }
         }
         .hero-title {
-            font-size: clamp(2.2rem, 8vw, 3.8rem);
+            font-size: clamp(1.9rem, 7vw, 3.2rem);
             color: white;
-            text-shadow: 3px 3px 0 #9B59B6, 0 0 30px rgba(255,110,180,0.55);
+            text-shadow: 3px 3px 0 #9B59B6, 0 0 28px rgba(255,110,180,0.5);
             margin: 6px 0 0;
-            animation: glow 2.5s ease-in-out infinite alternate;
-        }
-        @keyframes glow {
-            from { text-shadow: 3px 3px 0 #9B59B6, 0 0 20px rgba(255,110,180,0.4); }
-            to   { text-shadow: 3px 3px 0 #9B59B6, 0 0 50px rgba(255,110,180,0.85); }
         }
         .hero-sub {
-            font-size: clamp(1rem, 3.5vw, 1.3rem);
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
             color: rgba(255,255,255,0.92);
             font-family: 'Nunito', sans-serif;
-            margin: 8px 0 14px;
+            margin: 6px 0 12px;
         }
-        .stars-pill {
+        .stats-row {
             display: inline-flex;
+            gap: 10px;
             align-items: center;
-            gap: 8px;
             background: rgba(255,255,255,0.92);
             border-radius: 50px;
-            padding: 10px 22px;
-            font-size: 1.35rem;
+            padding: 8px 18px;
+            font-size: 1.1rem;
             color: #9B59B6;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.14);
-            margin-bottom: 6px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
         }
         .date-line {
             color: rgba(255,255,255,0.85);
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-family: 'Nunito', sans-serif;
-            margin: 0 0 22px;
+            margin: 8px 0 18px;
         }
-        .tip-box {
-            background: rgba(255,255,255,0.55);
-            border-radius: 18px;
-            padding: 12px 18px;
-            font-size: 0.95rem;
-            color: #7D3C98;
-            font-family: 'Nunito', sans-serif;
-            text-align: center;
-            margin-top: 22px;
-            line-height: 1.5;
-        }
-        .tip-box strong { font-family: 'Fredoka One', cursive; }
     </style>
 </head>
 <body>
@@ -75,38 +58,63 @@
 
 <div class="container">
     <div class="hero">
-        <div class="mascot">🦄</div>
+        <div class="mascot" id="mascot">🦄</div>
         <h1 class="hero-title">Aubrey's Magic School</h1>
         <p class="hero-sub">Let's learn something magical today! ✨</p>
-        <div class="stars-pill">⭐ <span id="star-count">0</span> Stars Earned!</div>
+        <div class="stats-row">
+            ⭐ <span id="star-count">0</span> stars
+            <span style="color:#D7A8F0">•</span>
+            🎀 <span id="sticker-count-pill">0</span> stickers
+        </div>
         <p class="date-line" id="date-line"></p>
     </div>
 
-    <div class="cards-grid">
-        <a href="alphabet.html" class="card">
-            <div class="card-emoji">🔤</div>
-            <h2 class="card-title">Learn ABCs</h2>
-            <p class="card-sub">Tap every letter!</p>
-        </a>
-        <a href="tracing.html" class="card">
-            <div class="card-emoji">✏️</div>
-            <h2 class="card-title">Write My Name</h2>
-            <p class="card-sub">Trace A-U-B-R-E-Y</p>
-        </a>
-        <a href="numbers.html" class="card">
-            <div class="card-emoji">🔢</div>
-            <h2 class="card-title">Count with Me</h2>
-            <p class="card-sub">Numbers 1 to 10</p>
-        </a>
-        <a href="colors.html" class="card">
-            <div class="card-emoji">🌈</div>
-            <h2 class="card-title">Colors!</h2>
-            <p class="card-sub">Find the right color</p>
-        </a>
-    </div>
+    <!-- Today's Magic Lesson banner (links to lesson.html) -->
+    <a href="lesson.html" class="lesson-banner" id="lesson-banner">
+        <p class="lesson-eyebrow">Today's Magic Lesson</p>
+        <span class="lesson-emoji" id="lesson-emoji">🔤</span>
+        <h2 class="lesson-title"  id="lesson-title">Learn some ABCs!</h2>
+        <span class="lesson-cta"  id="lesson-cta">Let's Go! →</span>
+    </a>
 
-    <div class="tip-box">
-        <strong>Today's Activity:</strong> <span id="daily-tip">Choose an activity above! 🌟</span>
+    <!-- 6-card guided path -->
+    <div class="path-grid">
+        <a href="tracing.html" class="path-card">
+            <span class="path-card-emoji">✏️</span>
+            <h3 class="path-card-title">Name Practice</h3>
+            <span class="path-progress" id="prog-name">Trace AUBREY</span>
+        </a>
+
+        <a href="alphabet.html" class="path-card">
+            <span class="path-card-emoji">🔤</span>
+            <h3 class="path-card-title">Alphabet</h3>
+            <span class="path-progress" id="prog-abc">0 / 26 letters</span>
+        </a>
+
+        <a href="numbers.html" class="path-card">
+            <span class="path-card-emoji">🔢</span>
+            <h3 class="path-card-title">Numbers</h3>
+            <span class="path-progress" id="prog-num">0 / 10 counted</span>
+        </a>
+
+        <a href="colors.html" class="path-card">
+            <span class="path-card-emoji">🌈</span>
+            <h3 class="path-card-title">Colors &amp; Shapes</h3>
+            <span class="path-progress">Play color game</span>
+        </a>
+
+        <a href="stickers.html" class="path-card">
+            <span class="path-card-emoji">⭐</span>
+            <h3 class="path-card-title">Sticker Board</h3>
+            <span class="path-progress" id="prog-stickers">0 stickers</span>
+        </a>
+
+        <div class="path-card disabled" aria-disabled="true">
+            <span class="coming-soon-badge">Soon</span>
+            <span class="path-card-emoji">👩</span>
+            <h3 class="path-card-title">Parent Tools</h3>
+            <span class="path-progress">Coming soon</span>
+        </div>
     </div>
 </div>
 
@@ -117,31 +125,47 @@
 initSparkles();
 initStarBar();
 
-const days  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+// Date + mascot
+const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const now   = new Date();
+const now    = new Date();
 document.getElementById('date-line').textContent =
     `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
 
-const tips = {
-    0: 'Fun Sunday: try Colors! 🌈',
-    1: 'Monday: start with ABCs! 🔤',
-    2: 'Tuesday: count to 10! 🔢',
-    3: 'Wednesday: write your name! ✏️',
-    4: 'Thursday: can you learn 5 new letters? 🔤',
-    5: 'Friday: play Colors & Numbers! 🌈',
-    6: 'Saturday: try everything today! ⭐'
-};
-document.getElementById('daily-tip').textContent = tips[now.getDay()];
+// Today's lesson
+const lesson = getTodaysLesson();
+document.getElementById('lesson-emoji').textContent = lesson.emoji;
+document.getElementById('lesson-title').textContent = lesson.title;
+const banner = document.getElementById('lesson-banner');
+if (isLessonCompletedToday()) {
+    banner.classList.add('complete');
+    document.getElementById('lesson-cta').textContent = '✓ Done — try again?';
+}
 
-// Tap mascot for surprise
-document.querySelector('.mascot').addEventListener('click', () => {
-    const surprises = ['🦄✨', '🧜‍♀️💙', '👸💜', '🌈⭐', '💖🎀'];
-    document.querySelector('.mascot').textContent =
-        surprises[Math.floor(Math.random() * surprises.length)];
-    speak('You found a magic surprise!', 0.9, 1.3);
+// Progress pills
+const letters   = getLearnedLetters();
+const numbers   = getEarnedNumbers();
+const stickers  = getStickers();
+const nameLevel = getNameLevel();
+
+document.getElementById('prog-abc').textContent      = `${letters.length} / 26 letters`;
+document.getElementById('prog-num').textContent      = `${numbers.length} / 10 counted`;
+document.getElementById('prog-stickers').textContent =
+    stickers.length === 1 ? '1 sticker' : `${stickers.length} stickers`;
+document.getElementById('sticker-count-pill').textContent = stickers.length;
+document.getElementById('prog-name').textContent =
+    nameLevel >= 3 ? '✓ Name mastered!' :
+    nameLevel >= 1 ? `Level ${nameLevel + 1}`  :
+                     'Trace AUBREY';
+
+// Mascot tap easter egg (kept from original)
+document.getElementById('mascot').addEventListener('click', () => {
+    const surprises = ['🦄✨', '🧜‍♀️💙', '👸💜', '🌈⭐', '💖🎀', '🪄✨'];
+    const el = document.getElementById('mascot');
+    el.textContent = surprises[Math.floor(Math.random() * surprises.length)];
+    speak('You found a magic surprise!', 0.92, 1.25);
     launchConfetti();
-    setTimeout(() => document.querySelector('.mascot').textContent = '🦄', 2500);
+    setTimeout(() => el.textContent = '🦄', 2500);
 });
 </script>
 </body>

@@ -68,6 +68,9 @@ function addStars(n) {
             { duration: 400, easing: 'ease' }
         );
     }
+    // Phase 1: bookkeeping for the guided path
+    if (typeof touchActivity === 'function')      touchActivity();
+    if (typeof checkForNewStickers === 'function') checkForNewStickers();
     return total;
 }
 
@@ -155,4 +158,96 @@ function showCelebration(headline, sub, onDone) {
             onDone();
         }, 2800);
     }
+}
+
+/* ============================================================
+   Phase 1 additions — guided learning path support
+   ============================================================ */
+
+function getLearnedLetters() {
+    return JSON.parse(localStorage.getItem('learnedLetters') || '[]');
+}
+function getEarnedNumbers() {
+    return JSON.parse(localStorage.getItem('earnedNumbers') || '[]');
+}
+function getNameLevel() {
+    return parseInt(localStorage.getItem('nameLevel') || '0');
+}
+function setNameLevel(level) {
+    if (level > getNameLevel()) localStorage.setItem('nameLevel', level);
+}
+function getStickers() {
+    return JSON.parse(localStorage.getItem('stickers') || '[]');
+}
+function getLastActivity() {
+    return localStorage.getItem('lastActivity');
+}
+function touchActivity() {
+    localStorage.setItem('lastActivity', new Date().toISOString());
+}
+function getLessonsCompleted() {
+    return JSON.parse(localStorage.getItem('lessonsCompleted') || '[]');
+}
+function todayKey() {
+    return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+function markLessonComplete() {
+    const list = getLessonsCompleted();
+    const today = todayKey();
+    if (!list.includes(today)) {
+        list.push(today);
+        localStorage.setItem('lessonsCompleted', JSON.stringify(list));
+    }
+}
+function isLessonCompletedToday() {
+    return getLessonsCompleted().includes(todayKey());
+}
+
+// Themed sticker pool — princess / unicorn / mermaid / sparkle
+const STICKER_POOL = [
+    '🦄','🌈','⭐','💖','🦋','👑','🧜‍♀️','💎',
+    '🌸','✨','🪄','🐱','🐰','🌙','🦩','🌺',
+    '🎀','👸','🌷','🍭'
+];
+
+// Every 5 stars = 1 new sticker. Called silently after addStars.
+function checkForNewStickers() {
+    const deserved  = Math.floor(getStars() / 5);
+    const stickers  = getStickers();
+    const newCount  = deserved - stickers.length;
+    if (newCount <= 0) return 0;
+    const today = todayKey();
+    for (let i = 0; i < newCount; i++) {
+        stickers.push({
+            emoji:     STICKER_POOL[Math.floor(Math.random() * STICKER_POOL.length)],
+            date:      today,
+            milestone: (stickers.length + 1) * 5
+        });
+    }
+    localStorage.setItem('stickers', JSON.stringify(stickers));
+    return newCount;
+}
+
+/* ============================================================
+   Lesson picker — one suggested activity per weekday
+   ============================================================ */
+const DAILY_LESSONS = [
+    // Sunday
+    { activity:'name',     title:'Practice your name!',  emoji:'✏️', href:'tracing.html',  cta:'Trace AUBREY' },
+    // Monday
+    { activity:'alphabet', title:'Learn some ABCs!',     emoji:'🔤', href:'alphabet.html', cta:'Tap the letters' },
+    // Tuesday
+    { activity:'numbers',  title:'Count to ten!',        emoji:'🔢', href:'numbers.html',  cta:'Let\'s count' },
+    // Wednesday
+    { activity:'name',     title:'Write your name!',     emoji:'✏️', href:'tracing.html',  cta:'Trace AUBREY' },
+    // Thursday
+    { activity:'colors',   title:'Play the colors game!',emoji:'🌈', href:'colors.html',   cta:'Find the colors' },
+    // Friday
+    { activity:'alphabet', title:'Sing the ABCs!',       emoji:'🎵', href:'alphabet.html', cta:'Sing along' },
+    // Saturday
+    { activity:'stickers', title:'See your stickers!',   emoji:'⭐', href:'stickers.html', cta:'Open the board' }
+];
+
+function getTodaysLesson() {
+    return DAILY_LESSONS[new Date().getDay()];
 }
