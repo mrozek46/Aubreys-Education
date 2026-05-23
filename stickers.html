@@ -16,15 +16,6 @@
 
     <h1 class="page-title">🎀 Sticker Board 🎀</h1>
 
-    <!-- TEMP debug panel — remove once issue is solved -->
-    <div id="debug-panel" style="background:#fff;border-radius:14px;padding:12px;margin-bottom:14px;font-family:monospace;font-size:11px;color:#444;line-height:1.5;border:2px solid #FFD700;">
-        <b>🐞 debug</b><br>
-        <span id="dbg-stars">stars=?</span><br>
-        <span id="dbg-stickers">stickers=?</span><br>
-        <span id="dbg-url">url=?</span><br>
-        <span id="dbg-keys">keys=?</span>
-    </div>
-
     <div class="sticker-summary">
         <p class="count" id="sticker-total">0</p>
         <p class="label" id="sticker-label">stickers earned</p>
@@ -43,18 +34,6 @@
 
 <script src="shared.js"></script>
 <script>
-// TEMP debug — show raw localStorage values so we can diagnose the 0/0 issue
-try {
-    document.getElementById('dbg-stars').textContent    = 'aubreyStars=' + JSON.stringify(localStorage.getItem('aubreyStars'));
-    document.getElementById('dbg-stickers').textContent = 'stickers=' + (localStorage.getItem('stickers') || 'null').slice(0, 120);
-    document.getElementById('dbg-url').textContent      = 'url=' + window.location.href;
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i));
-    document.getElementById('dbg-keys').textContent = 'keys=' + JSON.stringify(keys);
-} catch (e) {
-    document.getElementById('dbg-stars').textContent = 'ERR: ' + e.message;
-}
-
 initSparkles();
 initStarBar();
 
@@ -82,12 +61,12 @@ if (need <= 0) {
 // Build the board: show all earned + 8 empty slots so it always looks full
 const SHOW_EMPTY = Math.max(8, total + 4 - (total % 4));
 const grid       = document.getElementById('sticker-grid');
-const todayKey   = new Date().toISOString().slice(0, 10);
+const today      = todayKey();
 
 stickers.forEach(s => {
     const slot = document.createElement('div');
     slot.className = 'sticker-slot filled';
-    if (s.date === todayKey) slot.classList.add('new');
+    if (s.date === today) slot.classList.add('new');
     slot.textContent = s.emoji;
     slot.addEventListener('pointerdown', () => {
         speak('Sticker!');
