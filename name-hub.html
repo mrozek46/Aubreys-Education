@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Name Practice ✏️</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Home</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">✏️ Name Practice</h1>
+    <p class="hub-intro">Four magic levels to master your name: <strong>AUBREY</strong> 💖</p>
+
+    <div class="name-progress-pill" id="progress-pill">Start with Level 1!</div>
+
+    <div class="level-grid" id="level-grid"></div>
+
+    <div class="all-mastered-banner" id="mastered-banner" style="display:none;">
+        🏆 You mastered your name, Aubrey! 🏆
+    </div>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+const HUB_LEVELS = [
+    { num:1, title:'Find Your Name',    emoji:'👀', sub:'Which one says AUBREY?',  href:'name-recognize.html' },
+    { num:2, title:'Spell It Out',      emoji:'🔤', sub:'Tap the letters in order', href:'name-order.html' },
+    { num:3, title:'Trace the Letters', emoji:'✏️', sub:'Trace A U B R E Y',        href:'tracing.html' },
+    { num:4, title:'Write the Whole Name', emoji:'⭐', sub:'Write AUBREY all at once', href:'tracing.html?mode=fullname' }
+];
+
+initSparkles();
+initStarBar();
+
+const completed = getNameLevel();
+const grid = document.getElementById('level-grid');
+
+HUB_LEVELS.forEach(lv => {
+    const isComplete = completed >= lv.num;
+    const isUnlocked = completed >= lv.num - 1;
+    const card = document.createElement(isUnlocked ? 'a' : 'div');
+    card.className = 'level-card' +
+        (isComplete ? ' complete' : '') +
+        (isUnlocked ? '' : ' locked');
+    if (isUnlocked) card.href = lv.href;
+    card.innerHTML =
+        `<div class="level-num">Level ${lv.num}</div>` +
+        `<div class="level-emoji">${isUnlocked ? lv.emoji : '🔒'}</div>` +
+        `<div class="level-title">${lv.title}</div>` +
+        `<div class="level-sub">${isUnlocked ? lv.sub : 'Finish Level ' + (lv.num - 1) + ' first'}</div>` +
+        (isComplete ? '<div class="level-check">✓ Done!</div>' : '');
+    grid.appendChild(card);
+});
+
+const pill = document.getElementById('progress-pill');
+if (completed === 0) {
+    pill.textContent = '⭐ Start with Level 1!';
+} else if (completed >= HUB_LEVELS.length) {
+    pill.textContent = '🏆 All 4 levels mastered!';
+    document.getElementById('mastered-banner').style.display = 'block';
+} else {
+    pill.textContent = `🌟 ${completed} of ${HUB_LEVELS.length} levels done!`;
+}
+
+setTimeout(() => {
+    if (completed === 0) {
+        speak('Let\'s practice your name, Aubrey! Start with Level 1.');
+    } else if (completed >= HUB_LEVELS.length) {
+        speak('Wow! You mastered all four levels! Amazing job!');
+    } else {
+        const next = completed + 1;
+        speak(`Great job! Let's try Level ${next} now!`);
+    }
+}, 350);
+</script>
+</body>
+</html>

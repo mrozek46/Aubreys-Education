@@ -27,14 +27,14 @@
 <div class="sparkles" id="sparkles"></div>
 
 <div class="container">
-    <a href="index.html" class="back-btn">← Home</a>
+    <a href="name-hub.html" class="back-btn">← Levels</a>
     <div class="star-bar">⭐ <span id="star-count">0</span></div>
 
-    <h1 class="page-title">✏️ Write My Name!</h1>
+    <h1 class="page-title" id="page-title">✏️ Write My Name!</h1>
 
-    <p class="instruction">Trace each letter with your finger! 👆</p>
+    <p class="instruction" id="instruction">Trace each letter with your finger! 👆</p>
 
-    <!-- AUBREY letter indicators -->
+    <!-- AUBREY letter indicators (hidden in full-name mode) -->
     <div class="aubrey-letters-row" id="letters-row">
         <!-- built by JS -->
     </div>
@@ -52,7 +52,7 @@
         <button class="btn" id="next-btn" onclick="nextLetter()">Next Letter →</button>
     </div>
 
-    <div class="progress-bar" style="margin-top:18px">
+    <div class="progress-bar" style="margin-top:18px" id="progress-bar">
         <div class="progress-fill" id="progress-fill" style="width:0%"></div>
     </div>
 </div>
@@ -68,6 +68,7 @@
 <script src="shared.js"></script>
 <script>
 const NAME = ['A','U','B','R','E','Y'];
+const FULL_NAME_MODE = new URLSearchParams(window.location.search).get('mode') === 'fullname';
 let currentIdx = 0;
 let isDrawing  = false;
 let hue        = 0;
@@ -76,15 +77,28 @@ let hasDrawn   = false;
 initSparkles();
 initStarBar();
 
-// Build letter indicators
-const row = document.getElementById('letters-row');
-NAME.forEach((letter, i) => {
-    const div = document.createElement('div');
-    div.className = 'al' + (i === 0 ? ' active' : '');
-    div.textContent = letter;
-    div.id = 'al-' + i;
-    row.appendChild(div);
-});
+if (FULL_NAME_MODE) {
+    document.getElementById('page-title').textContent  = '⭐ Write AUBREY!';
+    document.getElementById('instruction').textContent = 'Trace your whole name with your finger! 👆';
+    document.getElementById('ghost-letter').textContent = 'AUBREY';
+    document.getElementById('ghost-letter').classList.add('ghost-full-name');
+    document.getElementById('current-label').innerHTML = 'Trace <strong style="color:#FFD700">AUBREY</strong> all at once!';
+    document.getElementById('letters-row').style.display = 'none';
+    document.getElementById('progress-bar').style.display = 'none';
+    document.getElementById('next-btn').textContent = '🎉 I did it!';
+}
+
+// Build letter indicators (only used in letter-by-letter mode)
+if (!FULL_NAME_MODE) {
+    const row = document.getElementById('letters-row');
+    NAME.forEach((letter, i) => {
+        const div = document.createElement('div');
+        div.className = 'al' + (i === 0 ? ' active' : '');
+        div.textContent = letter;
+        div.id = 'al-' + i;
+        row.appendChild(div);
+    });
+}
 
 // Canvas setup
 const canvas = document.getElementById('trace-canvas');
@@ -180,9 +194,23 @@ function updateUI() {
 
 function nextLetter() {
     if (!hasDrawn) {
-        speak('Try tracing the letter first!');
+        speak('Try tracing first!');
         return;
     }
+
+    if (FULL_NAME_MODE) {
+        addStars(5);
+        setNameLevel(4);
+        document.getElementById('ghost-letter').textContent = '🌟';
+        document.getElementById('current-label').textContent = '';
+        showCelebration('🏆 AUBREY! 🏆', 'You wrote your whole name! You are AMAZING! 🦄✨');
+        speak('Wow! You wrote Aubrey all at once! You are so amazing!');
+        const celBtn = document.getElementById('cel-btn');
+        celBtn.textContent = '🏠 Back to Levels';
+        celBtn.onclick = () => window.location.href = 'name-hub.html';
+        return;
+    }
+
     addStars(1);
     clearCanvas();
 
@@ -191,28 +219,29 @@ function nextLetter() {
         updateUI();
         speak(`Great job! Now trace the letter ${NAME[currentIdx]}!`);
     } else {
-        // All done!
+        // Level 3 complete
         currentIdx = NAME.length;
         NAME.forEach((_, i) => { document.getElementById('al-' + i).className = 'al done'; });
         document.getElementById('progress-fill').style.width = '100%';
         document.getElementById('ghost-letter').textContent = '🌟';
         document.getElementById('current-label').textContent = '';
 
-        showCelebration(
-            '🎉 AUBREY! 🎉',
-            'You wrote your whole name! You are AMAZING! 🦄✨'
-        );
-        speak('Aubrey! You did it! You wrote your whole name! You are so amazing!');
+        setNameLevel(3);
+        showCelebration('🎉 AUBREY! 🎉', 'You traced every letter! You are AMAZING! 🦄✨');
+        speak('Aubrey! You traced your whole name! You are so amazing!');
 
         const celBtn = document.getElementById('cel-btn');
-        celBtn.textContent = '🏠 Back to Home';
-        celBtn.onclick = () => window.location.href = 'index.html';
+        celBtn.textContent = '🏠 Back to Levels';
+        celBtn.onclick = () => window.location.href = 'name-hub.html';
     }
 }
 
 // Init
-updateUI();
-speak(`Let's write your name! Trace the letter ${NAME[0]} with your finger!`, 0.88, 1.2);
+if (!FULL_NAME_MODE) updateUI();
+const introText = FULL_NAME_MODE
+    ? 'Now write your whole name all at once! Trace AUBREY with your finger!'
+    : `Let's write your name! Trace the letter ${NAME[0]} with your finger!`;
+speak(introText, 0.88, 1.2);
 </script>
 </body>
 </html>

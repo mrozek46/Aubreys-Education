@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Find Your Name 👀</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="name-hub.html" class="back-btn">← Levels</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">👀 Find Your Name!</h1>
+    <p class="hub-intro">Tap the word that says <strong>AUBREY</strong>! 💖</p>
+
+    <div class="name-word-grid" id="word-grid"></div>
+
+    <p class="phase2-feedback" id="feedback"></p>
+
+    <div class="trace-controls" style="margin-top:8px;">
+        <button class="btn-clear" id="hear-btn">🔊 Hear them again</button>
+    </div>
+</div>
+
+<div class="celebration-overlay" id="celebration-overlay">
+    <div class="celebrate-text" id="celebrate-text"></div>
+    <div class="celebrate-sub"  id="celebrate-sub"></div>
+    <button class="btn" id="cel-btn">Next Level →</button>
+</div>
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+const DISTRACTORS = ['SUMMER','GRACE','EMMA','LILY','OLIVIA','SOPHIA','CHARLIE','EMILY','MOLLY','HARPER'];
+
+initSparkles();
+initStarBar();
+
+let locked = false;
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function hearAll() {
+    if (locked) return;
+    const tiles = document.querySelectorAll('.name-word-btn');
+    let i = 0;
+    function next() {
+        if (i >= tiles.length) return;
+        const tile = tiles[i];
+        tile.classList.add('reading');
+        speak(tile.textContent, 0.8, 1.2);
+        setTimeout(() => {
+            tile.classList.remove('reading');
+            i++;
+            next();
+        }, 1500);
+    }
+    next();
+}
+
+function render() {
+    locked = false;
+    document.getElementById('feedback').textContent = '';
+    const words = shuffle(['AUBREY', ...shuffle(DISTRACTORS).slice(0, 2)]);
+    const grid = document.getElementById('word-grid');
+    grid.innerHTML = '';
+    words.forEach(w => {
+        const btn = document.createElement('button');
+        btn.className = 'name-word-btn';
+        btn.textContent = w;
+        btn.addEventListener('pointerdown', () => handlePick(w, btn));
+        grid.appendChild(btn);
+    });
+}
+
+function handlePick(word, btn) {
+    if (locked) return;
+    if (word === 'AUBREY') {
+        locked = true;
+        btn.classList.add('correct');
+        speak('Yes! That spells Aubrey! That\'s your name!');
+        addStars(2);
+        setNameLevel(1);
+        setTimeout(() => {
+            showCelebration('🎉 That\'s your name! 🎉', 'AUBREY — you found it! ⭐');
+            const cel = document.getElementById('cel-btn');
+            cel.textContent = 'Next Level →';
+            cel.onclick = () => window.location.href = 'name-hub.html';
+        }, 1200);
+    } else {
+        btn.classList.add('wrong');
+        speak(`That says ${word}. Find AUBREY!`, 0.85);
+        document.getElementById('feedback').textContent = `That says ${word}. Keep looking!`;
+        setTimeout(() => btn.classList.remove('wrong'), 800);
+    }
+}
+
+document.getElementById('hear-btn').addEventListener('pointerdown', hearAll);
+
+render();
+
+// Auto-intro on load: prompt then read all three words
+setTimeout(() => {
+    speak('Which one says Aubrey? Listen!', 0.88, 1.2);
+    setTimeout(hearAll, 1800);
+}, 400);
+</script>
+</body>
+</html>
