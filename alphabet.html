@@ -7,6 +7,35 @@
     <title>Learn ABCs 🔤</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        .top-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 4px 0 18px;
+            flex-wrap: wrap;
+        }
+        .btn-song {
+            background: linear-gradient(135deg, #FFD700, #FF8E53);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 22px;
+            font-family: inherit;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 16px rgba(255,140,80,0.45);
+            transition: transform 0.12s;
+        }
+        .btn-song:active { transform: scale(0.94); }
+        .btn-song.singing {
+            background: linear-gradient(135deg, #FF6EB4, #9B59B6);
+            animation: sing-pulse 0.9s ease-in-out infinite;
+        }
+        @keyframes sing-pulse {
+            0%, 100% { transform: scale(1);    box-shadow: 0 5px 16px rgba(155,89,182,0.45); }
+            50%       { transform: scale(1.05); box-shadow: 0 8px 24px rgba(155,89,182,0.65); }
+        }
+
         .progress-text {
             text-align: center;
             color: white;
@@ -14,31 +43,106 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
             margin-bottom: 6px;
         }
-        .letter-btn .sub { font-size: 0.45em; display: block; margin-top: 3px; }
 
-        /* replay button inside popup */
-        .popup-replay {
-            background: transparent;
-            border: 2px solid #D7A8F0;
-            color: #9B59B6;
-            border-radius: 50px;
-            padding: 10px 22px;
-            font-family: inherit;
-            font-size: 1.1rem;
-            cursor: pointer;
-            margin-right: 10px;
-            transition: transform 0.12s;
+        /* New letter tile design */
+        .letter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
         }
-        .popup-replay:active { transform: scale(0.92); }
+        @media (min-width: 640px) {
+            .letter-grid { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+        }
+        @media (min-width: 900px) {
+            .letter-grid { grid-template-columns: repeat(6, 1fr); }
+        }
+
+        .letter-btn {
+            background: linear-gradient(135deg, #FFA5D2, #C9A0E8);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 14px 6px 10px;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 5px 14px rgba(155,89,182,0.28);
+            transition: transform 0.12s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            position: relative;
+        }
+        .letter-btn:active { transform: scale(0.9); }
+        .letter-btn.learned {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 5px 14px rgba(255,165,0,0.45);
+        }
+        .letter-btn.learned::after {
+            content: '⭐';
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            font-size: 0.8rem;
+        }
+        .letter-btn.singing {
+            animation: tile-singing 0.6s ease;
+            transform: scale(1.1);
+            z-index: 5;
+        }
+        @keyframes tile-singing {
+            0%, 100% { transform: scale(1);    }
+            50%       { transform: scale(1.18); }
+        }
+
+        .l-upper {
+            font-size: clamp(1.8rem, 6vw, 2.4rem);
+            line-height: 1;
+        }
+        .l-lower {
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            opacity: 0.85;
+            margin-top: 1px;
+        }
+        .l-emoji {
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            margin-top: 4px;
+        }
+
+        /* Popup updates - both cases shown */
+        .popup-cases {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 8px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .popup-upper {
+            font-size: clamp(5rem, 18vw, 7rem);
+            background: linear-gradient(135deg, #FF6EB4, #9B59B6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .popup-lower {
+            font-size: clamp(3rem, 11vw, 4.5rem);
+            background: linear-gradient(135deg, #FF6EB4, #9B59B6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.85;
+        }
 
         .all-done-banner {
             display: none;
             text-align: center;
-            background: linear-gradient(135deg,#FFD700,#FFA500);
+            background: linear-gradient(135deg, #FFD700, #FFA500);
             border-radius: 20px;
             padding: 18px;
             margin-bottom: 18px;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: white;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
             box-shadow: 0 6px 20px rgba(255,165,0,0.4);
@@ -56,11 +160,15 @@
     <h1 class="page-title">🔤 Learn ABCs!</h1>
 
     <div class="all-done-banner" id="all-done">
-        🎉 Amazing! You know ALL 26 letters! You're a superstar! ⭐🦄
+        🎉 Amazing! You know ALL 26 letters! ⭐🦄
     </div>
 
-    <p class="progress-text">Tap each letter to learn it!
-        <span id="learned-count">0</span>/26 letters ⭐</p>
+    <div class="top-actions">
+        <button class="btn-song" id="sing-btn" onclick="toggleSing()">🎵 Sing the ABCs!</button>
+        <button class="btn-song" onclick="randomLetter()">🎲 Surprise Letter!</button>
+    </div>
+
+    <p class="progress-text"><span id="learned-count">0</span> of 26 letters learned ⭐</p>
     <div class="progress-bar">
         <div class="progress-fill" id="progress-fill" style="width:0%"></div>
     </div>
@@ -71,12 +179,13 @@
 <!-- Popup -->
 <div class="popup-overlay" id="overlay" onclick="closePopup()"></div>
 <div class="letter-popup" id="popup">
-    <div class="popup-big-letter" id="popup-letter">A</div>
-    <div class="popup-emoji"      id="popup-emoji">🍎</div>
-    <div class="popup-word"       id="popup-word">Apple</div>
-    <div class="popup-phrase"     id="popup-phrase">A says "Ah!"</div>
-    <button class="popup-replay"  id="popup-replay" onclick="replaySound()">🔊 Hear it again!</button>
-    <button class="popup-close"   onclick="closePopup()">All done! ✨</button>
+    <div class="popup-cases">
+        <span class="popup-upper" id="popup-upper">A</span>
+        <span class="popup-lower" id="popup-lower">a</span>
+    </div>
+    <div class="popup-emoji" id="popup-emoji">🍎</div>
+    <div class="popup-word"  id="popup-word">Apple</div>
+    <button class="popup-close" onclick="closePopup()">All done! ✨</button>
 </div>
 
 <!-- Celebration -->
@@ -92,36 +201,38 @@
 <script src="shared.js"></script>
 <script>
 const LETTERS = [
-    { l:'A', w:'Apple',     e:'🍎',  p:'A says "Ah"!' },
-    { l:'B', w:'Butterfly', e:'🦋',  p:'B says "Buh"!' },
-    { l:'C', w:'Crown',     e:'👑',  p:'C says "Kuh"!' },
-    { l:'D', w:'Diamond',   e:'💎',  p:'D says "Duh"!' },
-    { l:'E', w:'Elephant',  e:'🐘',  p:'E says "Eh"!' },
-    { l:'F', w:'Flower',    e:'🌸',  p:'F says "Fuh"!' },
-    { l:'G', w:'Glitter',   e:'✨',  p:'G says "Guh"!' },
-    { l:'H', w:'Heart',     e:'❤️',  p:'H says "Huh"!' },
-    { l:'I', w:'Ice Cream', e:'🍦',  p:'I says "Ih"!' },
-    { l:'J', w:'Jellyfish', e:'🪼',  p:'J says "Juh"!' },
-    { l:'K', w:'Kitten',    e:'🐱',  p:'K says "Kuh"!' },
-    { l:'L', w:'Lollipop',  e:'🍭',  p:'L says "Luh"!' },
-    { l:'M', w:'Mermaid',   e:'🧜‍♀️', p:'M says "Muh"!' },
-    { l:'N', w:'Night Sky', e:'🌙',  p:'N says "Nuh"!' },
-    { l:'O', w:'Ocean',     e:'🌊',  p:'O says "Awe"!' },
-    { l:'P', w:'Princess',  e:'👸',  p:'P says "Puh"!' },
-    { l:'Q', w:'Queen',     e:'👑',  p:'Q says "Kwuh"!' },
-    { l:'R', w:'Rainbow',   e:'🌈',  p:'R says "Ruh"!' },
-    { l:'S', w:'Star',      e:'⭐',  p:'S says "Sss"!' },
-    { l:'T', w:'Tiara',     e:'🪄',  p:'T says "Tuh"!' },
-    { l:'U', w:'Unicorn',   e:'🦄',  p:'U says "Uh"!' },
-    { l:'V', w:'Violet',    e:'💜',  p:'V says "Vuh"!' },
-    { l:'W', w:'Wand',      e:'✨',  p:'W says "Wuh"!' },
-    { l:'X', w:'Xylophone', e:'🎵',  p:'X says "Ks"!' },
-    { l:'Y', w:'Yarn',      e:'🧶',  p:'Y says "Yuh"!' },
-    { l:'Z', w:'Zebra',     e:'🦓',  p:'Z says "Zuh"!' },
+    { l:'A', w:'Apple',     e:'🍎'  },
+    { l:'B', w:'Butterfly', e:'🦋'  },
+    { l:'C', w:'Crown',     e:'👑'  },
+    { l:'D', w:'Diamond',   e:'💎'  },
+    { l:'E', w:'Elephant',  e:'🐘'  },
+    { l:'F', w:'Flower',    e:'🌸'  },
+    { l:'G', w:'Glitter',   e:'✨'  },
+    { l:'H', w:'Heart',     e:'❤️'  },
+    { l:'I', w:'Ice Cream', e:'🍦'  },
+    { l:'J', w:'Jellyfish', e:'🪼'  },
+    { l:'K', w:'Kitten',    e:'🐱'  },
+    { l:'L', w:'Lollipop',  e:'🍭'  },
+    { l:'M', w:'Mermaid',   e:'🧜‍♀️' },
+    { l:'N', w:'Night Sky', e:'🌙'  },
+    { l:'O', w:'Ocean',     e:'🌊'  },
+    { l:'P', w:'Princess',  e:'👸'  },
+    { l:'Q', w:'Queen',     e:'👑'  },
+    { l:'R', w:'Rainbow',   e:'🌈'  },
+    { l:'S', w:'Star',      e:'⭐'  },
+    { l:'T', w:'Tiara',     e:'🪄'  },
+    { l:'U', w:'Unicorn',   e:'🦄'  },
+    { l:'V', w:'Violet',    e:'💜'  },
+    { l:'W', w:'Wand',      e:'✨'  },
+    { l:'X', w:'X-ray',     e:'🦴'  },
+    { l:'Y', w:'Yarn',      e:'🧶'  },
+    { l:'Z', w:'Zebra',     e:'🦓'  },
 ];
 
 let learned = JSON.parse(localStorage.getItem('learnedLetters') || '[]');
 let currentEntry = null;
+let isSinging = false;
+let singCancel = false;
 
 initSparkles();
 initStarBar();
@@ -138,45 +249,46 @@ const grid = document.getElementById('letter-grid');
 LETTERS.forEach(entry => {
     const btn = document.createElement('button');
     btn.className = 'letter-btn' + (learned.includes(entry.l) ? ' learned' : '');
-    btn.innerHTML = `${entry.l}<span class="sub">${entry.e}</span>`;
     btn.dataset.letter = entry.l;
+    btn.innerHTML =
+        `<span class="l-upper">${entry.l}</span>` +
+        `<span class="l-lower">${entry.l.toLowerCase()}</span>` +
+        `<span class="l-emoji">${entry.e}</span>`;
     btn.addEventListener('pointerdown', () => openPopup(entry, btn));
     grid.appendChild(btn);
 });
 
 updateProgress();
 
-function replaySound() {
-    if (!currentEntry) return;
-    speak(`${currentEntry.p} ${currentEntry.l} is for ${currentEntry.w}!`);
-}
-
 function openPopup(entry, btn) {
+    if (isSinging) return; // Don't interrupt the song
     currentEntry = entry;
-    document.getElementById('popup-letter').textContent = entry.l;
-    document.getElementById('popup-emoji').textContent  = entry.e;
-    document.getElementById('popup-word').textContent   = entry.w;
-    document.getElementById('popup-phrase').textContent = entry.p;
+    document.getElementById('popup-upper').textContent = entry.l;
+    document.getElementById('popup-lower').textContent = entry.l.toLowerCase();
+    document.getElementById('popup-emoji').textContent = entry.e;
+    document.getElementById('popup-word').textContent  = entry.w;
 
     document.getElementById('overlay').classList.add('show');
     document.getElementById('popup').classList.add('show');
 
-    speak(`${entry.p} ${entry.l} is for ${entry.w}!`);
+    speak(`${entry.l}. ${entry.w}.`);
 
-    if (!learned.includes(entry.l)) {
-        learned.push(entry.l);
-        localStorage.setItem('learnedLetters', JSON.stringify(learned));
-        btn.classList.add('learned');
-        addStars(1);
-        updateProgress();
+    markLearned(entry.l, btn);
+}
 
-        if (learned.length === 26) {
-            setTimeout(() => {
-                closePopup();
-                showCelebration('🌈 You know ALL the letters! 🌈', 'You are SO smart, Aubrey! ⭐');
-                speak('Amazing! You know all 26 letters! You are so smart!');
-            }, 1800);
-        }
+function markLearned(letter, btn) {
+    if (learned.includes(letter)) return;
+    learned.push(letter);
+    localStorage.setItem('learnedLetters', JSON.stringify(learned));
+    if (btn) btn.classList.add('learned');
+    addStars(1);
+    updateProgress();
+    if (learned.length === 26) {
+        setTimeout(() => {
+            closePopup();
+            showCelebration('🌈 You know ALL the letters! 🌈', 'You are SO smart, Aubrey! ⭐');
+            speak('Amazing! You know all 26 letters! You are so smart!');
+        }, 1600);
     }
 }
 
@@ -185,6 +297,66 @@ function closePopup() {
     document.getElementById('popup').classList.remove('show');
     window.speechSynthesis?.cancel();
     currentEntry = null;
+}
+
+function randomLetter() {
+    if (isSinging) return;
+    const entry = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+    const btn   = grid.querySelector(`[data-letter="${entry.l}"]`);
+    openPopup(entry, btn);
+}
+
+// Sing the ABCs - speak each letter in order while highlighting the tile
+function toggleSing() {
+    if (isSinging) {
+        stopSinging();
+    } else {
+        startSinging();
+    }
+}
+
+function startSinging() {
+    isSinging  = true;
+    singCancel = false;
+    const btn = document.getElementById('sing-btn');
+    btn.classList.add('singing');
+    btn.textContent = '⏹ Stop Singing';
+    sequenceLetters(0);
+}
+
+function stopSinging() {
+    singCancel = true;
+    isSinging  = false;
+    window.speechSynthesis?.cancel();
+    document.querySelectorAll('.letter-btn.singing').forEach(el => el.classList.remove('singing'));
+    const btn = document.getElementById('sing-btn');
+    btn.classList.remove('singing');
+    btn.textContent = '🎵 Sing the ABCs!';
+}
+
+function sequenceLetters(i) {
+    if (singCancel || i >= LETTERS.length) {
+        stopSinging();
+        if (!singCancel) {
+            setTimeout(() => {
+                speak('Now I know my A B Cs! Next time won\'t you sing with me!', 0.95, 1.2);
+            }, 200);
+        }
+        return;
+    }
+    const entry = LETTERS[i];
+    const tile  = grid.querySelector(`[data-letter="${entry.l}"]`);
+    document.querySelectorAll('.letter-btn.singing').forEach(el => el.classList.remove('singing'));
+    if (tile) {
+        tile.classList.add('singing');
+        // Scroll the tile into view for the iPad
+        tile.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    speak(entry.l, 0.95, 1.2);
+    markLearned(entry.l, tile);
+
+    setTimeout(() => sequenceLetters(i + 1), 850);
 }
 </script>
 </body>

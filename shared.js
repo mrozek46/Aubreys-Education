@@ -1,10 +1,54 @@
 /* Shared utilities across all activity pages */
 
-function speak(text, rate = 0.88, pitch = 1.25) {
+let _cachedVoices = [];
+let _preferredVoice = null;
+
+function _loadVoices() {
+    _cachedVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+    _preferredVoice = _pickBestVoice(_cachedVoices);
+}
+
+function _pickBestVoice(voices) {
+    if (!voices || !voices.length) return null;
+    // High-quality voices to prefer, in order. "Samantha" is the friendly
+    // default US iOS voice; the Enhanced/Premium variants sound the best.
+    const preferred = [
+        'Samantha (Enhanced)', 'Samantha (Premium)',
+        'Ava (Enhanced)',      'Ava (Premium)',
+        'Allison (Enhanced)',  'Allison',
+        'Karen (Enhanced)',    'Karen',
+        'Samantha',
+        'Susan',
+        'Microsoft Aria',      'Microsoft Jenny',  'Microsoft Zira',
+        'Google US English',
+    ];
+    for (const name of preferred) {
+        const v = voices.find(v => v.name === name);
+        if (v) return v;
+    }
+    // Fallback: any English voice, preferring US
+    return voices.find(v => v.lang === 'en-US')
+        || voices.find(v => v.lang && v.lang.startsWith('en'))
+        || voices[0];
+}
+
+if ('speechSynthesis' in window) {
+    _loadVoices();
+    window.speechSynthesis.onvoiceschanged = _loadVoices;
+}
+
+function speak(text, rate = 0.92, pitch = 1.15) {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.rate = rate;
+    if (!_preferredVoice) _loadVoices();
+    if (_preferredVoice) {
+        u.voice = _preferredVoice;
+        u.lang  = _preferredVoice.lang || 'en-US';
+    } else {
+        u.lang = 'en-US';
+    }
+    u.rate  = rate;
     u.pitch = pitch;
     window.speechSynthesis.speak(u);
 }
