@@ -88,7 +88,7 @@ function render() {
         grid.appendChild(btn);
     });
 
-    setTimeout(() => speak(`Find the letter ${target}!`, 0.85, 1.2), 250);
+    setTimeout(() => speak(`Find the letter ${target}!`, 0.7, 1.2), 450);
 }
 
 function handlePick(letter, btn) {
@@ -108,7 +108,7 @@ function handlePick(letter, btn) {
         streak++;
         localStorage.setItem('alphabetFindStreak', streak);
         document.getElementById('streak').textContent = streak;
-        speak(`Yes! ${letter}!`, 0.85, 1.25);
+        speak(`Yes! ${letter}!`, 0.7, 1.25);
 
         if (streak > 0 && streak % 5 === 0) {
             setTimeout(() => {
@@ -118,13 +118,13 @@ function handlePick(letter, btn) {
                     document.getElementById('celebration-overlay').classList.remove('show');
                     render();
                 };
-            }, 700);
+            }, 1400);
         } else {
-            setTimeout(render, 1000);
+            setTimeout(render, 1800);
         }
     } else {
         btn.classList.add('wrong');
-        speak(`That's ${letter}. Find the ${target}!`, 0.85);
+        speak(`That's ${letter}. Find the ${target}!`, 0.7);
         document.getElementById('feedback').textContent = `That was ${letter}. Find ${target}!`;
         streak = 0;
         localStorage.setItem('alphabetFindStreak', streak);
@@ -134,7 +134,7 @@ function handlePick(letter, btn) {
 }
 
 document.getElementById('hear-btn').addEventListener('pointerdown', () => {
-    if (target) speak(`Find the letter ${target}!`, 0.85, 1.2);
+    if (target) speak(`Find the letter ${target}!`, 0.7, 1.2);
 });
 
 render();
