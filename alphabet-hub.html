@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Alphabet 🔤</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Home</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">🔤 Alphabet</h1>
+    <p class="hub-intro">Learn the letters or play the find game!</p>
+
+    <div class="name-progress-pill" id="progress-pill">0 of 26 letters learned</div>
+
+    <div class="level-grid">
+        <a href="alphabet.html" class="level-card">
+            <div class="level-num">Learn</div>
+            <div class="level-emoji">🔤</div>
+            <div class="level-title">Learn the ABCs</div>
+            <div class="level-sub">Tap a letter to hear it!</div>
+        </a>
+
+        <a href="alphabet-find.html" class="level-card">
+            <div class="level-num">Game</div>
+            <div class="level-emoji">🔍</div>
+            <div class="level-title">Find the Letter</div>
+            <div class="level-sub">Tap the right one!</div>
+        </a>
+    </div>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+initSparkles();
+initStarBar();
+
+const learned = getLearnedLetters();
+const pill = document.getElementById('progress-pill');
+if (learned.length === 0) {
+    pill.textContent = '⭐ Start learning the ABCs!';
+} else if (learned.length === 26) {
+    pill.textContent = '🏆 You know all 26 letters!';
+} else {
+    pill.textContent = `🌟 ${learned.length} of 26 letters learned`;
+}
+
+setTimeout(() => {
+    if (learned.length === 0) {
+        speak('Let\'s learn the alphabet! Pick Learn or play the find game.');
+    } else if (learned.length === 26) {
+        speak('Wow! You know all the letters! Pick a game to play!');
+    } else {
+        speak('Let\'s practice your letters!');
+    }
+}, 350);
+</script>
+</body>
+</html>
