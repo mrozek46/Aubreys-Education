@@ -79,10 +79,10 @@
 
     <!-- 6-card guided path — original card style -->
     <div class="cards-grid">
-        <a href="tracing.html" class="card">
+        <a href="name-hub.html" class="card">
             <div class="card-emoji">✏️</div>
             <h3 class="card-title">Name Practice</h3>
-            <p class="card-sub" id="prog-name">Trace AUBREY</p>
+            <p class="card-sub" id="prog-name">Start with Level 1</p>
         </a>
 
         <a href="alphabet.html" class="card">
@@ -154,9 +154,9 @@ document.getElementById('prog-stickers').textContent =
     stickers.length === 1 ? '1 sticker' : `${stickers.length} stickers`;
 document.getElementById('sticker-count-pill').textContent = stickers.length;
 document.getElementById('prog-name').textContent =
-    nameLevel >= 3 ? '✓ Name mastered!' :
-    nameLevel >= 1 ? `Level ${nameLevel + 1}`  :
-                     'Trace AUBREY';
+    nameLevel >= 4 ? '✓ Name mastered!' :
+    nameLevel >= 1 ? `Level ${nameLevel + 1} of 4` :
+                     'Start with Level 1';
 
 // Mascot tap easter egg (kept from original)
 document.getElementById('mascot').addEventListener('click', () => {

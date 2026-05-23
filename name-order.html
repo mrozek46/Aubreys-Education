@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Spell Your Name 🔤</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="name-hub.html" class="back-btn">← Levels</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">🔤 Spell Your Name!</h1>
+    <p class="hub-intro">Tap the letters in order to spell <strong>AUBREY</strong>!</p>
+
+    <div class="spell-target" id="target-row"></div>
+
+    <p class="phase2-feedback" id="feedback"></p>
+
+    <div class="spell-tiles" id="tile-row"></div>
+
+    <div class="trace-controls">
+        <button class="btn-clear" onclick="resetGame()">↺ Start Over</button>
+    </div>
+</div>
+
+<div class="celebration-overlay" id="celebration-overlay">
+    <div class="celebrate-text" id="celebrate-text"></div>
+    <div class="celebrate-sub"  id="celebrate-sub"></div>
+    <button class="btn" id="cel-btn">Next Level →</button>
+</div>
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+const AUBREY = ['A','U','B','R','E','Y'];
+let placedCount = 0;
+
+initSparkles();
+initStarBar();
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function resetGame() {
+    placedCount = 0;
+    document.getElementById('feedback').textContent = '';
+
+    const target = document.getElementById('target-row');
+    target.innerHTML = '';
+    AUBREY.forEach((letter, i) => {
+        const slot = document.createElement('div');
+        slot.className = 'spell-slot empty';
+        slot.dataset.idx = i;
+        slot.textContent = letter;
+        target.appendChild(slot);
+    });
+
+    const tileRow = document.getElementById('tile-row');
+    tileRow.innerHTML = '';
+    shuffle([...AUBREY]).forEach(letter => {
+        const tile = document.createElement('button');
+        tile.className = 'spell-tile';
+        tile.textContent = letter;
+        tile.dataset.letter = letter;
+        tile.addEventListener('pointerdown', () => handleTap(tile, letter));
+        tileRow.appendChild(tile);
+    });
+}
+
+function handleTap(tile, letter) {
+    if (tile.disabled || tile.classList.contains('used')) return;
+    const expected = AUBREY[placedCount];
+
+    if (letter === expected) {
+        tile.classList.add('used');
+        tile.disabled = true;
+        const slot = document.querySelector(`.spell-slot[data-idx="${placedCount}"]`);
+        slot.classList.remove('empty');
+        slot.classList.add('filled');
+        speak(letter, 0.85, 1.25);
+        document.getElementById('feedback').textContent = '';
+        placedCount++;
+
+        if (placedCount === AUBREY.length) {
+            setTimeout(() => {
+                addStars(3);
+                setNameLevel(2);
+                speak('A! U! B! R! E! Y! Aubrey! You spelled your name!');
+                showCelebration('🎉 A-U-B-R-E-Y! 🎉', 'You spelled your whole name! ⭐');
+                const cel = document.getElementById('cel-btn');
+                cel.textContent = 'Next Level →';
+                cel.onclick = () => window.location.href = 'name-hub.html';
+            }, 600);
+        }
+    } else {
+        tile.classList.add('wrong');
+        speak(`Find the ${expected}!`, 0.85);
+        document.getElementById('feedback').textContent = `The next letter is ${expected}!`;
+        setTimeout(() => tile.classList.remove('wrong'), 700);
+    }
+}
+
+resetGame();
+setTimeout(() => speak('Tap the letters to spell your name! Start with A!'), 400);
+</script>
+</body>
+</html>

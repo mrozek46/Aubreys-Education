@@ -233,13 +233,13 @@ function checkForNewStickers() {
    ============================================================ */
 const DAILY_LESSONS = [
     // Sunday
-    { activity:'name',     title:'Practice your name!',  emoji:'✏️', href:'tracing.html',  cta:'Trace AUBREY' },
+    { activity:'name',     title:'Practice your name!',  emoji:'✏️', href:'name-hub.html', cta:'Open Name Practice' },
     // Monday
     { activity:'alphabet', title:'Learn some ABCs!',     emoji:'🔤', href:'alphabet.html', cta:'Tap the letters' },
     // Tuesday
     { activity:'numbers',  title:'Count to ten!',        emoji:'🔢', href:'numbers.html',  cta:'Let\'s count' },
     // Wednesday
-    { activity:'name',     title:'Write your name!',     emoji:'✏️', href:'tracing.html',  cta:'Trace AUBREY' },
+    { activity:'name',     title:'Write your name!',     emoji:'✏️', href:'name-hub.html', cta:'Open Name Practice' },
     // Thursday
     { activity:'colors',   title:'Play the colors game!',emoji:'🌈', href:'colors.html',   cta:'Find the colors' },
     // Friday
