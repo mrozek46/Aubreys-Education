@@ -53,15 +53,10 @@ if (learned.length === 0) {
     pill.textContent = `🌟 ${learned.length} of 26 letters learned`;
 }
 
-setTimeout(() => {
-    if (learned.length === 0) {
-        speak('Let\'s learn the alphabet! Pick Learn or play the find game.');
-    } else if (learned.length === 26) {
-        speak('Wow! You know all the letters! Pick a game to play!');
-    } else {
-        speak('Let\'s practice your letters!');
-    }
-}, 350);
+// Only speak on first visit when nothing has been learned yet.
+if (learned.length === 0) {
+    setTimeout(() => speak('Let\'s learn the alphabet! Pick Learn or play the find game.'), 350);
+}
 </script>
 </body>
 </html>
