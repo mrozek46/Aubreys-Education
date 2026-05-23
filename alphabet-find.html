@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Find the Letter 🔍</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="alphabet-hub.html" class="back-btn">← Back</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">🔍 Find the Letter!</h1>
+
+    <p class="find-prompt" id="prompt">Find the letter <strong id="target-letter">A</strong>!</p>
+
+    <div class="streak-row">
+        <span class="streak-pill">🔥 Streak: <span id="streak">0</span></span>
+        <button class="streak-hear" id="hear-btn" type="button">🔊 Say it again</button>
+    </div>
+
+    <div class="find-grid" id="find-grid"></div>
+
+    <p class="phase2-feedback" id="feedback"></p>
+</div>
+
+<div class="celebration-overlay" id="celebration-overlay">
+    <div class="celebrate-text" id="celebrate-text"></div>
+    <div class="celebrate-sub"  id="celebrate-sub"></div>
+    <button class="btn" id="cel-btn">Keep going! 🌟</button>
+</div>
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+const ALPHABET   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const AUBREY_SET = new Set(['A','U','B','R','E','Y']);
+let target  = null;
+let streak  = parseInt(localStorage.getItem('alphabetFindStreak') || '0');
+let locked  = false;
+
+initSparkles();
+initStarBar();
+document.getElementById('streak').textContent = streak;
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function pickTarget() {
+    // Weight her name letters more so they show up often
+    const learned = getLearnedLetters();
+    const pool = [];
+    AUBREY_SET.forEach(l => { pool.push(l, l); });           // 2x weight for AUBREY
+    learned.forEach(l => { if (!AUBREY_SET.has(l)) pool.push(l); });
+    if (pool.length < 4) {
+        // Not enough variety yet — fall back to A-J so we have options
+        return ALPHABET[Math.floor(Math.random() * 10)];
+    }
+    let pick;
+    do { pick = pool[Math.floor(Math.random() * pool.length)]; }
+    while (pick === target);
+    return pick;
+}
+
+function pickDistractors(correct, n) {
+    const pool = shuffle(ALPHABET.filter(l => l !== correct));
+    return pool.slice(0, n);
+}
+
+function render() {
+    locked = false;
+    document.getElementById('feedback').textContent = '';
+    target = pickTarget();
+    document.getElementById('target-letter').textContent = target;
+
+    const choices = shuffle([target, ...pickDistractors(target, 3)]);
+    const grid = document.getElementById('find-grid');
+    grid.innerHTML = '';
+    choices.forEach(letter => {
+        const btn = document.createElement('button');
+        btn.className = 'find-tile';
+        btn.textContent = letter;
+        btn.dataset.letter = letter;
+        btn.addEventListener('pointerdown', () => handlePick(letter, btn));
+        grid.appendChild(btn);
+    });
+
+    setTimeout(() => speak(`Find the letter ${target}!`, 0.85, 1.2), 250);
+}
+
+function handlePick(letter, btn) {
+    if (locked) return;
+    if (letter === target) {
+        locked = true;
+        btn.classList.add('correct');
+        addStars(1);
+
+        // Mark as learned (links into the existing Learn page progress)
+        const learned = getLearnedLetters();
+        if (!learned.includes(letter)) {
+            learned.push(letter);
+            localStorage.setItem('learnedLetters', JSON.stringify(learned));
+        }
+
+        streak++;
+        localStorage.setItem('alphabetFindStreak', streak);
+        document.getElementById('streak').textContent = streak;
+        speak(`Yes! ${letter}!`, 0.85, 1.25);
+
+        if (streak > 0 && streak % 5 === 0) {
+            setTimeout(() => {
+                showCelebration(`🔥 ${streak} in a row! 🔥`, 'You are on fire! Keep going!');
+                const cel = document.getElementById('cel-btn');
+                cel.onclick = () => {
+                    document.getElementById('celebration-overlay').classList.remove('show');
+                    render();
+                };
+            }, 700);
+        } else {
+            setTimeout(render, 1000);
+        }
+    } else {
+        btn.classList.add('wrong');
+        speak(`That's ${letter}. Find the ${target}!`, 0.85);
+        document.getElementById('feedback').textContent = `That was ${letter}. Find ${target}!`;
+        streak = 0;
+        localStorage.setItem('alphabetFindStreak', streak);
+        document.getElementById('streak').textContent = streak;
+        setTimeout(() => btn.classList.remove('wrong'), 700);
+    }
+}
+
+document.getElementById('hear-btn').addEventListener('pointerdown', () => {
+    if (target) speak(`Find the letter ${target}!`, 0.85, 1.2);
+});
+
+render();
+</script>
+</body>
+</html>

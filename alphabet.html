@@ -153,7 +153,7 @@
 <div class="sparkles" id="sparkles"></div>
 
 <div class="container">
-    <a href="index.html" class="back-btn">← Home</a>
+    <a href="alphabet-hub.html" class="back-btn">← Back</a>
 
     <div class="star-bar">⭐ <span id="star-count">0</span></div>
 
@@ -244,11 +244,15 @@ function updateProgress() {
     if (n === 26) document.getElementById('all-done').style.display = 'block';
 }
 
+const AUBREY_SET = new Set(['A','U','B','R','E','Y']);
+
 // Build grid
 const grid = document.getElementById('letter-grid');
 LETTERS.forEach(entry => {
     const btn = document.createElement('button');
-    btn.className = 'letter-btn' + (learned.includes(entry.l) ? ' learned' : '');
+    btn.className = 'letter-btn' +
+        (learned.includes(entry.l) ? ' learned' : '') +
+        (AUBREY_SET.has(entry.l) ? ' is-aubrey' : '');
     btn.dataset.letter = entry.l;
     btn.innerHTML =
         `<span class="l-upper">${entry.l}</span>` +
