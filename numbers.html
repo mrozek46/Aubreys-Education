@@ -115,7 +115,7 @@ function tapItem(idx, span) {
     if (span.classList.contains('counted')) return;
     countedSoFar++;
     span.classList.add('counted');
-    speak(WORDS[countedSoFar - 1], 0.88, 1.3);
+    speak(WORDS[countedSoFar - 1], 0.7, 1.2);
     document.getElementById('count-status').textContent =
         `${countedSoFar} out of ${NUMBERS[currentIdx].n}`;
 
@@ -156,7 +156,7 @@ function autoCount() {
         if (i >= entry.n) { isAutocounting = false; return; }
         items[i].classList.add('counted');
         countedSoFar++;
-        speak(WORDS[i], 0.88, 1.3);
+        speak(WORDS[i], 0.7, 1.2);
         document.getElementById('count-status').textContent =
             `${countedSoFar} out of ${entry.n}`;
         i++;
@@ -189,12 +189,12 @@ function changeNumber(dir) {
     currentIdx = next;
     renderNumber();
     const entry = NUMBERS[currentIdx];
-    speak(`The number ${entry.n}. ${entry.word}!`);
+    speak(`The number ${entry.n}. ${entry.word}!`, 0.7, 1.2);
 }
 
 // Init
 renderNumber();
-speak('Let\'s count together! Tap each one to count!');
+speak('Let\'s count together! Tap each one to count!', 0.7, 1.2);
 </script>
 </body>
 </html>

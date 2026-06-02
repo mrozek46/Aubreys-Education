@@ -114,7 +114,7 @@ function renderRound() {
     document.getElementById('round-num').textContent   = round + 1;
     document.getElementById('progress-fill').style.width = (round / totalRounds * 100) + '%';
 
-    speak(`Find the color ${correct.name}! ${correct.say}`);
+    setTimeout(() => speak(`Find the color ${correct.name}! ${correct.say}`, 0.7, 1.2), 350);
 
     const grid = document.getElementById('color-choices');
     grid.innerHTML = '';
@@ -138,18 +138,16 @@ function handleChoice(btn, chosen) {
         score++;
         document.getElementById('score').textContent = score;
         document.getElementById('feedback-text').textContent = '✅ Yes! ' + currentCorrect.say;
-        speak(`Yes! That\'s ${currentCorrect.name}! Amazing!`);
+        speak(`Yes! That's ${currentCorrect.name}! Amazing!`, 0.7, 1.2, () => {
+            if (round < totalRounds) setTimeout(renderRound, 400);
+            else setTimeout(() => endGame(), 400);
+        });
         addStars(1);
         round++;
-        if (round < totalRounds) {
-            setTimeout(renderRound, 1600);
-        } else {
-            setTimeout(() => endGame(), 1600);
-        }
     } else {
         btn.classList.add('wrong');
         document.getElementById('feedback-text').textContent = `❌ Try again! Find ${currentCorrect.name}!`;
-        speak(`Hmm, try again! Find the color ${currentCorrect.name}!`);
+        speak(`Hmm, try again! Find the color ${currentCorrect.name}!`, 0.7, 1.2);
         setTimeout(() => {
             btn.classList.remove('wrong');
             locked = false;

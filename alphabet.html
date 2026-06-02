@@ -275,7 +275,7 @@ function openPopup(entry, btn) {
     document.getElementById('overlay').classList.add('show');
     document.getElementById('popup').classList.add('show');
 
-    speak(`${entry.l} is for ${entry.w}.`, 0.8);
+    speak(`${entry.l} is for ${entry.w}.`, 0.7, 1.2);
 
     markLearned(entry.l, btn);
 }

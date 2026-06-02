@@ -81,7 +81,7 @@ function handleTap(tile, letter) {
         const slot = document.querySelector(`.spell-slot[data-idx="${placedCount}"]`);
         slot.classList.remove('empty');
         slot.classList.add('filled');
-        speak(letter, 0.85, 1.25);
+        speak(letter, 0.7, 1.2);
         document.getElementById('feedback').textContent = '';
         placedCount++;
 
@@ -98,7 +98,7 @@ function handleTap(tile, letter) {
         }
     } else {
         tile.classList.add('wrong');
-        speak(`Find the ${expected}!`, 0.85);
+        speak(`Find the ${expected}!`, 0.7, 1.2);
         document.getElementById('feedback').textContent = `The next letter is ${expected}!`;
         setTimeout(() => tile.classList.remove('wrong'), 700);
     }
