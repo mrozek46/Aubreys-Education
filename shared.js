@@ -245,7 +245,7 @@ const DAILY_LESSONS = [
     // Wednesday
     { activity:'name',     title:'Write your name!',     emoji:'✏️', href:'name-hub.html', cta:'Open Name Practice' },
     // Thursday
-    { activity:'colors',   title:'Play the colors game!',emoji:'🌈', href:'colors.html',   cta:'Find the colors' },
+    { activity:'colors',   title:'Play the colors game!',emoji:'🌈', href:'colors-hub.html', cta:'Find the colors' },
     // Friday
     { activity:'alphabet', title:'Sing the ABCs!',       emoji:'🎵', href:'alphabet.html', cta:'Sing along' },
     // Saturday
