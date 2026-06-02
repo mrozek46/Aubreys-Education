@@ -52,7 +52,7 @@ function hearAll() {
         if (i >= tiles.length) return;
         const tile = tiles[i];
         tile.classList.add('reading');
-        speak(tile.textContent, 0.8, 1.2);
+        speak(tile.textContent, 0.7, 1.2);
         setTimeout(() => {
             tile.classList.remove('reading');
             i++;
@@ -93,7 +93,7 @@ function handlePick(word, btn) {
         }, 1200);
     } else {
         btn.classList.add('wrong');
-        speak(`That says ${word}. Find AUBREY!`, 0.85);
+        speak(`That says ${word}. Find AUBREY!`, 0.7, 1.2);
         document.getElementById('feedback').textContent = `That says ${word}. Keep looking!`;
         setTimeout(() => btn.classList.remove('wrong'), 800);
     }
@@ -105,7 +105,7 @@ render();
 
 // Auto-intro on load: prompt then read all three words
 setTimeout(() => {
-    speak('Which one says Aubrey? Listen!', 0.88, 1.2);
+    speak('Which one says Aubrey? Listen!', 0.7, 1.2);
     setTimeout(hearAll, 1800);
 }, 400);
 </script>

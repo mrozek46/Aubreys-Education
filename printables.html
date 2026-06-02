@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Printables 🖨️</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .print-card {
+            background: rgba(255,255,255,0.92);
+            border-radius: 22px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .print-card h2 {
+            font-size: 1.1rem;
+            color: #9B59B6;
+            margin: 0 0 6px;
+        }
+        .print-card p {
+            font-size: 0.88rem;
+            color: #BB8FCE;
+            font-family: 'Nunito', sans-serif;
+            margin: 0 0 14px;
+        }
+        .btn-print {
+            background: linear-gradient(135deg, #FF6EB4, #9B59B6);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(155,89,182,0.4);
+        }
+        .btn-print:active { transform: scale(0.96); }
+
+        /* ===================== PRINT SHEETS ===================== */
+        .print-sheet { display: none; }
+
+        @media print {
+            body > .sparkles,
+            body > .container { display: none !important; }
+            .print-sheet { display: block !important; }
+            .print-sheet.active { display: block; }
+
+            @page { margin: 18mm 14mm; }
+
+            .sheet-title {
+                font-family: 'Nunito', sans-serif;
+                font-size: 26pt;
+                color: #9B59B6;
+                text-align: center;
+                margin-bottom: 8mm;
+            }
+            .sheet-sub {
+                font-family: 'Nunito', sans-serif;
+                font-size: 13pt;
+                color: #BB8FCE;
+                text-align: center;
+                margin-bottom: 10mm;
+            }
+
+            /* Name tracing sheet */
+            .name-trace-row {
+                display: flex;
+                justify-content: center;
+                gap: 6mm;
+                margin-bottom: 14mm;
+            }
+            .trace-letter-box {
+                width: 22mm;
+                height: 26mm;
+                border: 2px dashed #D7A8F0;
+                border-radius: 6mm;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 44pt;
+                font-family: 'Nunito', sans-serif;
+                font-weight: 900;
+                color: #E8CFFB;
+            }
+            .trace-letter-box.solid {
+                color: #9B59B6;
+                border-style: solid;
+            }
+
+            /* Number sheet */
+            .number-grid {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 6mm;
+                margin-bottom: 10mm;
+            }
+            .number-box {
+                border: 2px dashed #D7A8F0;
+                border-radius: 5mm;
+                padding: 4mm;
+                text-align: center;
+            }
+            .number-big {
+                font-size: 36pt;
+                font-family: 'Nunito', sans-serif;
+                font-weight: 900;
+                color: #E8CFFB;
+                line-height: 1;
+            }
+            .number-box.solid .number-big { color: #9B59B6; }
+            .number-word {
+                font-size: 11pt;
+                font-family: 'Nunito', sans-serif;
+                color: #BB8FCE;
+            }
+            .number-dots {
+                font-size: 14pt;
+                margin-top: 2mm;
+                letter-spacing: 1mm;
+            }
+
+            /* ABC sheet */
+            .abc-grid {
+                display: grid;
+                grid-template-columns: repeat(6, 1fr);
+                gap: 4mm;
+            }
+            .abc-box {
+                border: 2px dashed #D7A8F0;
+                border-radius: 4mm;
+                text-align: center;
+                padding: 3mm 1mm;
+            }
+            .abc-upper {
+                font-size: 26pt;
+                font-family: 'Nunito', sans-serif;
+                font-weight: 900;
+                color: #E8CFFB;
+                line-height: 1;
+            }
+            .abc-box.solid .abc-upper { color: #9B59B6; }
+            .abc-box.aubrey .abc-upper { color: #FF6EB4; }
+            .abc-lower {
+                font-size: 14pt;
+                color: #D7A8F0;
+                font-family: 'Nunito', sans-serif;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Home</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">🖨️ Printables</h1>
+    <p class="hub-intro">Print practice sheets to use offline!</p>
+
+    <div class="print-card">
+        <h2>✏️ Name Tracing Sheet</h2>
+        <p>Dotted AUBREY letters to trace, plus blank lines to practice.</p>
+        <button class="btn-print" onclick="printSheet('name')">🖨️ Print Name Sheet</button>
+    </div>
+
+    <div class="print-card">
+        <h2>🔢 Numbers Sheet</h2>
+        <p>Numbers 1–10 with their words and dot counters to trace.</p>
+        <button class="btn-print" onclick="printSheet('numbers')">🖨️ Print Numbers Sheet</button>
+    </div>
+
+    <div class="print-card">
+        <h2>🔤 Alphabet Sheet</h2>
+        <p>All 26 letters. Aubrey's name letters are highlighted in pink.</p>
+        <button class="btn-print" onclick="printSheet('abc')">🖨️ Print ABC Sheet</button>
+    </div>
+</div>
+
+<!-- NAME SHEET -->
+<div class="print-sheet" id="sheet-name">
+    <div class="sheet-title">✏️ Trace Your Name!</div>
+    <div class="sheet-sub">Trace the dotted letters, then try on your own!</div>
+
+    <div class="name-trace-row" id="name-trace-row-1"></div>
+    <div class="name-trace-row" id="name-trace-row-2"></div>
+    <div class="name-trace-row" id="name-trace-row-3"></div>
+
+    <div style="margin-top:12mm; border-bottom: 1.5pt solid #D7A8F0; margin-bottom:8mm"></div>
+    <div class="sheet-sub">Now write your name on the lines!</div>
+    <div style="border-bottom: 1.5pt solid #D7A8F0; margin-bottom:12mm;"></div>
+    <div style="border-bottom: 1.5pt solid #D7A8F0; margin-bottom:12mm;"></div>
+    <div style="border-bottom: 1.5pt solid #D7A8F0;"></div>
+</div>
+
+<!-- NUMBERS SHEET -->
+<div class="print-sheet" id="sheet-numbers">
+    <div class="sheet-title">🔢 Numbers 1–10</div>
+    <div class="sheet-sub">Trace the number, then write it yourself!</div>
+    <div class="number-grid" id="number-grid"></div>
+</div>
+
+<!-- ABC SHEET -->
+<div class="print-sheet" id="sheet-abc">
+    <div class="sheet-title">🔤 The Alphabet!</div>
+    <div class="sheet-sub">Aubrey's special letters are in pink 💖</div>
+    <div class="abc-grid" id="abc-grid"></div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+initSparkles();
+initStarBar();
+
+const AUBREY_SET  = new Set(['A','U','B','R','E','Y']);
+const ALPHABET    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const NUM_WORDS   = ['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
+const NUM_DOTS    = ['●','●●','●●●','●●●●','●●●●●','●●●●●●','●●●●●●●','●●●●●●●●','●●●●●●●●●','●●●●●●●●●●'];
+
+// Build name sheet rows
+function buildNameSheet() {
+    const NAME = ['A','U','B','R','E','Y'];
+    // Row 1: dotted (trace)
+    const r1 = document.getElementById('name-trace-row-1');
+    NAME.forEach(l => {
+        const box = document.createElement('div');
+        box.className = 'trace-letter-box';
+        box.textContent = l;
+        r1.appendChild(box);
+    });
+    // Rows 2-3: blank
+    ['name-trace-row-2','name-trace-row-3'].forEach(id => {
+        const row = document.getElementById(id);
+        NAME.forEach(() => {
+            const box = document.createElement('div');
+            box.className = 'trace-letter-box';
+            box.textContent = '';
+            row.appendChild(box);
+        });
+    });
+}
+
+// Build numbers sheet
+function buildNumbersSheet() {
+    const grid = document.getElementById('number-grid');
+    for (let i = 1; i <= 10; i++) {
+        const box = document.createElement('div');
+        box.className = 'number-box';
+        box.innerHTML =
+            `<div class="number-big">${i}</div>` +
+            `<div class="number-word">${NUM_WORDS[i-1]}</div>` +
+            `<div class="number-dots">${NUM_DOTS[i-1]}</div>`;
+        grid.appendChild(box);
+    }
+}
+
+// Build ABC sheet
+function buildAbcSheet() {
+    const grid = document.getElementById('abc-grid');
+    const learned = getLearnedLetters();
+    ALPHABET.forEach(l => {
+        const box = document.createElement('div');
+        box.className = 'abc-box' +
+            (AUBREY_SET.has(l) ? ' aubrey' : '') +
+            (learned.includes(l) ? ' solid' : '');
+        box.innerHTML =
+            `<div class="abc-upper">${l}</div>` +
+            `<div class="abc-lower">${l.toLowerCase()}</div>`;
+        grid.appendChild(box);
+    });
+}
+
+buildNameSheet();
+buildNumbersSheet();
+buildAbcSheet();
+
+let activeSheet = null;
+
+function printSheet(which) {
+    // Hide any previously shown sheet
+    if (activeSheet) activeSheet.style.display = 'none';
+    activeSheet = document.getElementById('sheet-' + which);
+    activeSheet.style.display = 'block';
+    setTimeout(() => {
+        window.print();
+        setTimeout(() => {
+            if (activeSheet) activeSheet.style.display = 'none';
+        }, 1000);
+    }, 50);
+}
+</script>
+</body>
+</html>
