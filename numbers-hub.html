@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Numbers 🔢</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Home</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">🔢 Numbers</h1>
+    <p class="hub-intro">Count along or play the find game!</p>
+
+    <div class="name-progress-pill" id="progress-pill">0 of 10 numbers counted</div>
+
+    <div class="level-grid">
+        <a href="numbers.html" class="level-card">
+            <div class="level-num">Count</div>
+            <div class="level-emoji">🔢</div>
+            <div class="level-title">Count with Me</div>
+            <div class="level-sub">Tap to count 1 to 10!</div>
+        </a>
+
+        <a href="numbers-find.html" class="level-card">
+            <div class="level-num">Game</div>
+            <div class="level-emoji">🔍</div>
+            <div class="level-title">Find the Number</div>
+            <div class="level-sub">Tap the right one!</div>
+        </a>
+    </div>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+initSparkles();
+initStarBar();
+
+const earned = getEarnedNumbers();
+const pill = document.getElementById('progress-pill');
+if (earned.length === 0) {
+    pill.textContent = '⭐ Start counting!';
+    setTimeout(() => speak('Let\'s practice numbers! Pick Count or play the find game.'), 350);
+} else if (earned.length === 10) {
+    pill.textContent = '🏆 You counted all 10 numbers!';
+} else {
+    pill.textContent = `🌟 ${earned.length} of 10 numbers counted`;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Find the Number 🔍</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="sparkles" id="sparkles"></div>
+
+<div class="container">
+    <a href="numbers-hub.html" class="back-btn">← Back</a>
+    <div class="star-bar">⭐ <span id="star-count">0</span></div>
+
+    <h1 class="page-title">🔍 Find the Number!</h1>
+
+    <p class="find-prompt" id="prompt">Find the number <strong id="target-number">1</strong>!</p>
+
+    <div class="streak-row">
+        <span class="streak-pill">🔥 Streak: <span id="streak">0</span></span>
+        <button class="streak-hear" id="hear-btn" type="button">🔊 Say it again</button>
+    </div>
+
+    <div class="find-grid" id="find-grid"></div>
+
+    <p class="phase2-feedback" id="feedback"></p>
+</div>
+
+<div class="celebration-overlay" id="celebration-overlay">
+    <div class="celebrate-text" id="celebrate-text"></div>
+    <div class="celebrate-sub"  id="celebrate-sub"></div>
+    <button class="btn" id="cel-btn">Keep going! 🌟</button>
+</div>
+<canvas id="confetti-canvas"></canvas>
+
+<script src="shared.js"></script>
+<script>
+const NUMBERS = [
+    { n:1,  word:'One',   emoji:'🦄' },
+    { n:2,  word:'Two',   emoji:'🌟' },
+    { n:3,  word:'Three', emoji:'🌸' },
+    { n:4,  word:'Four',  emoji:'💎' },
+    { n:5,  word:'Five',  emoji:'🐚' },
+    { n:6,  word:'Six',   emoji:'🌈' },
+    { n:7,  word:'Seven', emoji:'⭐' },
+    { n:8,  word:'Eight', emoji:'🦋' },
+    { n:9,  word:'Nine',  emoji:'💜' },
+    { n:10, word:'Ten',   emoji:'🍭' },
+];
+
+let targetNum = null;
+let streak    = parseInt(localStorage.getItem('numberFindStreak') || '0');
+let locked    = false;
+
+initSparkles();
+initStarBar();
+document.getElementById('streak').textContent = streak;
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function pickTarget() {
+    let pick;
+    do { pick = NUMBERS[Math.floor(Math.random() * NUMBERS.length)]; }
+    while (pick === targetNum);
+    return pick;
+}
+
+function pickDistractors(correct, n) {
+    return shuffle(NUMBERS.filter(x => x.n !== correct.n)).slice(0, n);
+}
+
+function render() {
+    locked = false;
+    document.getElementById('feedback').textContent = '';
+    targetNum = pickTarget();
+    document.getElementById('target-number').textContent = targetNum.n;
+
+    const choices = shuffle([targetNum, ...pickDistractors(targetNum, 3)]);
+    const grid = document.getElementById('find-grid');
+    grid.innerHTML = '';
+    choices.forEach(entry => {
+        const btn = document.createElement('button');
+        btn.className = 'find-tile num-tile';
+        btn.innerHTML = `<span class="num-tile-digit">${entry.n}</span><span class="num-tile-emoji">${entry.emoji}</span>`;
+        btn.addEventListener('pointerdown', () => handlePick(entry, btn));
+        grid.appendChild(btn);
+    });
+
+    setTimeout(() => speak(`Find the number ${targetNum.n}! ${targetNum.word}!`, 0.7, 1.2), 450);
+}
+
+function handlePick(entry, btn) {
+    if (locked) return;
+    if (entry.n === targetNum.n) {
+        locked = true;
+        btn.classList.add('correct');
+
+        const earned = getEarnedNumbers();
+        if (!earned.includes(entry.n)) {
+            earned.push(entry.n);
+            localStorage.setItem('earnedNumbers', JSON.stringify(earned));
+        }
+
+        addStars(1);
+        streak++;
+        localStorage.setItem('numberFindStreak', streak);
+        document.getElementById('streak').textContent = streak;
+
+        speak(`Yes! ${entry.n}! ${entry.word}!`, 0.7, 1.25, () => {
+            if (streak > 0 && streak % 5 === 0) {
+                setTimeout(() => {
+                    showCelebration(`🔥 ${streak} in a row! 🔥`, 'You are on fire! Keep going!');
+                    const cel = document.getElementById('cel-btn');
+                    cel.onclick = () => {
+                        document.getElementById('celebration-overlay').classList.remove('show');
+                        render();
+                    };
+                }, 300);
+            } else {
+                setTimeout(render, 500);
+            }
+        });
+    } else {
+        event.currentTarget.classList.add('wrong');
+        speak(`That's ${entry.n}. Find the ${targetNum.n}! ${targetNum.word}!`, 0.7);
+        document.getElementById('feedback').textContent = `That was ${entry.n}. Find ${targetNum.n}!`;
+        streak = 0;
+        localStorage.setItem('numberFindStreak', streak);
+        document.getElementById('streak').textContent = streak;
+        setTimeout(() => btn.classList.remove('wrong'), 700);
+    }
+}
+
+document.getElementById('hear-btn').addEventListener('pointerdown', () => {
+    if (targetNum) speak(`Find the number ${targetNum.n}! ${targetNum.word}!`, 0.7, 1.2);
+});
+
+render();
+</script>
+</body>
+</html>
