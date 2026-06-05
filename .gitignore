@@ -1,0 +1,5 @@
+# ElevenLabs credentials — never commit
+scripts/.env
+
+# Node
+node_modules/
