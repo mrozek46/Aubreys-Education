@@ -132,7 +132,7 @@ const _AUDIO_MAP = (() => {
 // Holds a reference to the currently playing Audio element so we can cancel it
 let _currentAudio = null;
 
-function _playAudio(src, onEnd) {
+function _playAudio(src, onFallback, onEnd) {
     if (_currentAudio) {
         _currentAudio.pause();
         _currentAudio.src = '';
@@ -140,15 +140,17 @@ function _playAudio(src, onEnd) {
     }
     const a = new Audio(src);
     _currentAudio = a;
-    if (onEnd) a.addEventListener('ended', onEnd, { once: true });
-    a.onerror = () => {
+    let fellBack = false;
+    const fallback = () => {
+        if (fellBack) return;
+        fellBack = true;
         _currentAudio = null;
-        if (onEnd) onEnd(); // don't leave the app hanging
+        // MP3 missing or couldn't play — use the browser voice instead.
+        onFallback();
     };
-    a.play().catch(() => {
-        _currentAudio = null;
-        if (onEnd) onEnd();
-    });
+    if (onEnd) a.addEventListener('ended', onEnd, { once: true });
+    a.onerror = fallback;
+    a.play().catch(fallback);
 }
 
 /* ── Web Speech API fallback ── */
@@ -212,7 +214,8 @@ function speak(text, rate = 0.7, pitch = 1.2, onEnd) {
     const key      = text.trim().toLowerCase();
     const audioSrc = _AUDIO_MAP[key];
     if (audioSrc) {
-        _playAudio(audioSrc, onEnd);
+        // Play the pre-generated MP3; if it's missing/fails, fall back to TTS.
+        _playAudio(audioSrc, () => _webSpeak(text, rate, pitch, onEnd), onEnd);
     } else {
         _webSpeak(text, rate, pitch, onEnd);
     }
